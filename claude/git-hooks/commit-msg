@@ -1,0 +1,4 @@
+#!/bin/sh
+# Removes AI attribution lines so only the founder appears as contributor.
+grep -viE '^(co-authored-by:.*(anthropic|claude)|claude-session:)|generated with \[?claude code' "$1" > "$1.tmp" || true
+mv "$1.tmp" "$1"
