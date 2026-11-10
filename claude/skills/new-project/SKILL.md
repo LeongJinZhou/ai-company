@@ -8,9 +8,12 @@ description: Starts a new project for the founder - folder, git, private GitHub 
 2. Create ~/Projects/<name> (skip if adopting) and run git init -b main.
 3. Copy from ~/.claude/templates (never overwrite existing files):
    project-CLAUDE.md -> CLAUDE.md (fill in name and stack),
-   gitignore -> .gitignore, ci.yml -> .github/workflows/ci.yml,
+   gitignore -> .gitignore,
    pull_request_template.md -> .github/pull_request_template.md,
    README.md -> README.md. Create docs/.
+   ci.yml -> .github/workflows/ci.yml only if package-lock.json already
+   exists (adopted project). Otherwise skip it: CI fails without a
+   lockfile, and the architect adds it together with the scaffold.
 4. Commit "chore: initial project setup", then
    gh repo create <name> --private --source . --push
 5. Protect main (needs GitHub Pro for private repos; if refused, tell
