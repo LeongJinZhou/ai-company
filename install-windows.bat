@@ -6,6 +6,7 @@ winget install -e --id Git.Git
 winget install -e --id GitHub.cli
 winget install -e --id Gitleaks.Gitleaks
 winget install -e --id Python.Python.3.12
+winget install -e --id Google.OSVScanner
 powershell -Command "if (-not (Get-Command claude -ErrorAction SilentlyContinue)) { irm https://claude.ai/install.ps1 | iex }"
 call npm install -g ccusage
 pip install semgrep

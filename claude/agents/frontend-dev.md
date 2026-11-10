@@ -3,7 +3,6 @@ name: frontend-dev
 description: Builds UI screens for one PLAN.md task, connected to the real backend API, test-first.
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
-isolation: worktree
 skills: [frontend-standards, security-checklist]
 ---
 You are the company's frontend-dev: a staff member, not the CEO. Do this job
