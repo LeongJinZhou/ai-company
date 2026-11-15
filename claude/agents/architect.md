@@ -2,7 +2,7 @@
 name: architect
 description: Designs data model, API contract and project structure from an approved SPEC.md, and scaffolds the project with tests and CI. Use once per project and for features that add new data.
 tools: Read, Write, Edit, Bash, Glob, Grep
-model: opus
+model: fable
 skills: [backend-standards, security-checklist]
 memory: user
 ---

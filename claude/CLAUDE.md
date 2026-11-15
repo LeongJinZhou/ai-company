@@ -43,15 +43,21 @@ Pick by the kind of order. ECC runs the middle; the company gates stay.
 | Not sure which ECC skill | `/ecc:ecc-guide` |
 
 Every workflow, in this order:
-1. Skills: check the skill map. If the task needs a plugin that is off,
-   enable it for the project and ask the founder to restart the session.
-2. ECC plans: always send `ecc:planner`, never plan in the lead's own head,
-   even when the founder approved the plan in advance. The founder approves
-   the plan (ECC Gate 1). A short brief with no spec goes through
-   brief-to-spec first.
-3. ECC builds test-first (`ecc:tdd-guide`) and reviews. All three reviews are
-   sent every time, none is optional: `ecc:code-reviewer`, the language
-   reviewer, `ecc:security-reviewer`.
+1. Skills: pick them for this task, every time. See "Skills are used, not
+   stored" below. No task starts with an empty skill list.
+2. Plan, sized to the task (see "Model routing"):
+   - Complex task: `ecc:planner` on fable writes the plan, then
+     `ecc:code-architect` on opus checks it is valid (fits the code, covers
+     the spec, nothing missing or unsafe). Fix the plan until the check passes.
+   - Normal task: `ecc:planner` on opus writes the plan. No separate check.
+   Never plan in the lead's own head, even when the founder approved the
+   plan in advance. The founder approves the plan (ECC Gate 1). A short
+   brief with no spec goes through brief-to-spec first.
+3. Build and review. Builders run on sonnet and follow the plan exactly,
+   test-first (`ecc:tdd-guide`); a builder that finds the plan wrong stops
+   and reports, it does not redesign. Reviews run on opus, in parallel, all
+   three every time: `ecc:code-reviewer`, the language reviewer,
+   `ecc:security-reviewer`.
 4. Company checks, in parallel, before any PR: security-reviewer (full OWASP
    checklist), integration-checker, tester for missing acceptance tests, and
    ux-reviewer if screens changed.
@@ -70,6 +76,25 @@ Every workflow, in this order:
 9. Founder says "release" (ECC has no release flow): full test run,
    /security-review, security-researcher, devops-engineer deploys,
    github-secretary tags the release, site-monitor checks errors afterwards.
+
+## Skills are used, not stored
+Workers cannot call skills themselves: only the lead has the Skill tool. So
+the lead puts the skills into the work:
+1. Match the task to skills before planning: its language, framework,
+   database, kind of work (API, UI, tests, migration, security, marketing,
+   game). Look in the lead's own skill list (`ecc:*`, superpowers) and in
+   the skill map for plugins that are off.
+2. Find each skill's file. Every installed plugin, on or off, keeps its
+   skills on disk: Glob `~/.claude/plugins/cache/**/skills/<name>/SKILL.md`.
+   A plugin that is off does NOT need enabling or a restart for this; enable
+   a plugin only when the task needs its commands, hooks or agents.
+3. Give each worker at most 3 skills that fit ITS job, as a line in the
+   brief: `Skills, read first: <full path>, <full path>`. A builder gets
+   the pattern and testing skills for the stack; a reviewer gets the
+   review or security skill for it.
+4. Each worker reports which skill files it read. The lead's report to the
+   founder has one line: `Skills used: ...`. A workflow that used none is
+   not done.
 
 ## Watching the work
 `/myoffice` opens a live local page of every session and sub-agent: who is
@@ -97,14 +122,25 @@ agent of the same name is always written `ecc:<name>`. Inside an ECC workflow
 use the `ecc:` agents it names; for the company checks use company staff.
 
 ## Model routing (choose per job, pass the model explicitly)
-fable  - THINK: the lead itself, and every planning job (`ecc:planner`,
-         planner). Decides how the work is done.
-opus   - DO AND CHECK (default): every other worker. Building, tests,
-         code review, security review, integration and UX checks,
-         devops, monitoring. Every evaluation and double-check is opus.
-sonnet - GITHUB ONLY: github-secretary (branches, commits, PRs, merges,
-         releases). Nothing else runs on sonnet.
-- haiku is not used.
+Plan, check, hand off. Each model does the part it is worth paying for.
+
+fable  - THINK, complex tasks only: the plan or design for new
+         architecture or data model, auth and permission design,
+         payments, changes across many modules, a bug that survived one
+         fix attempt. Fable writes the blueprint, never the code.
+opus   - LEAD, THINK (normal tasks) and CHECK: the main session; plans
+         for normal tasks; checks every fable plan before building; all
+         reviews and checks (code, security, tests, integration, UX).
+sonnet - EXECUTE: builds from an approved plan. `ecc:tdd-guide`,
+         backend-dev, frontend-dev, build resolvers, devops-engineer,
+         doc updates, github-secretary.
+haiku  - BULK: reading logs, monitor checks, sorting and summarising
+         large output. Never writes code or reviews.
+- Complex or normal? Complex if any fable line above applies, or the
+  task touches more than 3 modules. When unsure, treat it as normal; go
+  to fable if the opus plan fails its review twice.
+- Never spend fable or opus on typing out code that a plan already
+  describes. Never let sonnet decide design.
 - Pass the model on every Agent call. This table overrides the model
   named in any ECC agent file.
 
