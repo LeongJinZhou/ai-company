@@ -92,3 +92,45 @@ test('README has the banner, the CI badge and three diagrams', () => {
   assert.ok(readme.includes('actions/workflows/ci.yml/badge.svg'));
   assert.equal((readme.match(/```mermaid/g) || []).length, 3);
 });
+
+test('handbook names the tiers and the risky paths', () => {
+  const md = readFileSync(here('claude/CLAUDE.md'), 'utf8');
+  // each tier needs its own definition bullet, not just a mention in the table
+  for (const w of ['Tiny', 'Normal', 'Risky']) assert.match(md, new RegExp(`^- ${w}: \\S`, 'm'), `handbook lacks "- ${w}:" bullet`);
+  const risky = (md.match(/^- Risky:[\s\S]*?(?=\n\s*\n|\n- |(?![\s\S]))/m) || [''])[0].toLowerCase();
+  assert.ok(risky, 'no "- Risky:" paragraph');
+  for (const re of [/auth/, /migration/, /payment/, /dependenc/, /\bci\b/, /script/]) assert.match(risky, re);
+});
+
+test('agent models match the routing table', () => {
+  const models = {
+    architect: 'fable', 'backend-dev': 'sonnet', 'devops-engineer': 'sonnet', 'frontend-dev': 'sonnet',
+    'github-secretary': 'sonnet', 'integration-checker': 'opus', planner: 'opus', 'security-researcher': 'opus',
+    'security-reviewer': 'opus', 'site-monitor': 'haiku', tester: 'sonnet', 'ux-reviewer': 'opus',
+  };
+  const files = readdirSync(here('claude/agents')).filter((f) => f.endsWith('.md'));
+  assert.deepEqual(files.map((f) => f.slice(0, -3)).sort(), Object.keys(models).sort());
+  for (const f of files) {
+    const front = (readFileSync(here(`claude/agents/${f}`), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
+    const m = front.match(/^model:\s*(\S+)/m);
+    assert.equal(m?.[1], models[f.slice(0, -3)], `${f} model`);
+  }
+});
+
+test('hard rules forbid shell file writes', () => {
+  const md = readFileSync(here('claude/CLAUDE.md'), 'utf8');
+  const rules = (md.match(/^## Hard rules[\s\S]*?(?=^## |(?![\s\S]))/m) || [''])[0];
+  assert.ok(rules, 'no Hard rules section');
+  assert.match(rules, /\bWrite\b/);
+  assert.match(rules, /\bEdit\b/);
+  assert.ok(rules.includes('node -e'), 'no "node -e"');
+  assert.match(rules, /heredoc/i);
+  assert.match(rules, /only with the Write or Edit tools, never through the shell/);
+});
+
+test('README diagram 2 shows tiers and the tool gate', () => {
+  const blocks = [...readFileSync(here('README.md'), 'utf8').matchAll(/```mermaid([\s\S]*?)```/g)].map((m) => m[1]);
+  assert.equal(blocks.length, 3);
+  assert.ok(blocks[1].includes('Tier'), 'diagram 2 lacks Tier');
+  assert.match(blocks[1], /tool gate/i);
+});

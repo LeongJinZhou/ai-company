@@ -15,9 +15,9 @@ flowchart TD
     R["Always on<br>security, scale and testing rules"] -.-> W
     subgraph M["Model per job"]
         direction LR
-        M1["fable: plans complex tasks"]
-        M2["opus: leads, plans normal tasks, checks and reviews"]
-        M3["sonnet: builds from the approved plan"]
+        M1["fable: plans Risky tasks"]
+        M2["opus: leads, plans Normal tasks, checks and reviews"]
+        M3["sonnet: builds, plans Tiny tasks, some Normal checks"]
         M4["haiku: bulk reading"]
     end
     L -. "picks one per job" .-> M
@@ -27,15 +27,18 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Order"] --> B["Pick skills"]
-    B --> C["Plan: fable plus opus check, or opus"]
+    A["Order"] --> T["Tier from the order,<br>re-checked on plan and diff"]
+    T --> B["Pick skills"]
+    B --> C["Plan: sonnet, opus, or fable plus opus check"]
     C --> D["Gate 1: founder approves plan"]
-    D --> E["Build test-first: sonnet"]
-    E --> F["3 reviews in parallel: opus"]
-    F --> G["Company checks: security, integration, tests, UX"]
-    G --> H{"All green?"}
-    H -- no --> I["Fix list, max 3 rounds"]
-    I --> E
+    D --> E["Build: sonnet,<br>test-first for code"]
+    E --> G0{"tool gate green?<br>tests, lint, gitleaks, semgrep"}
+    G0 -- no --> E
+    G0 -- yes --> F["Tier crew checks in parallel"]
+    F --> H{"All green?"}
+    H -- no --> I["Fix list, scoped re-check,<br>max 3 rounds"]
+    I --> E2["Fix, tool gate,<br>scoped re-check"]
+    E2 --> H
     I -- "after 3 rounds" --> Z["Stop and ask the founder"]
     H -- yes --> J["PR and CI: github-secretary"]
     J --> K["Founder says ok"]
