@@ -66,6 +66,15 @@ Every workflow, in this order:
    /security-review, security-researcher, devops-engineer deploys,
    github-secretary tags the release, site-monitor checks errors afterwards.
 
+## Watching the work
+`/myoffice` opens a live local page of every session and sub-agent: who is
+thinking, running a tool, waiting for the founder, or done. When a workflow
+sends out more than one worker, tell the founder once that `/myoffice` shows
+them. It only reads session logs; it never changes or steers the work.
+The office labels a worker by the first line of its brief, not by its agent
+name, so start every brief with the name in brackets: `[ecc:planner] ...`,
+`[security-reviewer] ...`.
+
 ## Who wins when rules disagree
 1. The founder's order.
 2. Company rules: security, scale, testing, Hard rules below.

@@ -52,12 +52,21 @@ rows "$KIT/plugins.txt" | while read -r repo id state; do
 done
 claude plugin enable cc-plugin-you-should-know@builtin </dev/null >/dev/null 2>&1
 
+# Clone a GitHub repo to a folder, or pull it if it is already there.
+sync_repo() {
+  if [ -d "$2/.git" ]; then git -C "$2" pull --ff-only -q </dev/null
+  else git clone --depth 1 -q "https://github.com/$1" "$2" </dev/null; fi || echo "WARN: $1 not updated" >&2
+}
+
 echo "== Reference repos -> $DEST/vendor"
 mkdir -p "$DEST/vendor"
 rows "$KIT/refs.txt" | while read -r repo; do
-  dir="$DEST/vendor/${repo#*/}"
-  if [ -d "$dir/.git" ]; then git -C "$dir" pull --ff-only -q </dev/null
-  else git clone --depth 1 -q "https://github.com/$repo" "$dir" </dev/null; fi || echo "WARN: $repo not updated" >&2
+  sync_repo "$repo" "$DEST/vendor/${repo#*/}"
+done
+
+echo "== GitHub skills -> $DEST/skills"
+rows "$KIT/skills.txt" | while read -r repo name; do
+  sync_repo "$repo" "$DEST/skills/$name"
 done
 
 echo "== Check"

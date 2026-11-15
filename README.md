@@ -19,6 +19,7 @@ work; staff agents and plugin skills do it.
 | `claude/templates/`, `claude/git-hooks/` | Project templates and git safety hooks |
 | `plugins.txt` | Every plugin, and whether it is on or off |
 | `refs.txt` | Reference repos kept in `~/.claude/vendor` |
+| `skills.txt` | Skills pulled from their own GitHub repo (`/myoffice`: live view of all agents) |
 | `update.sh`, `check.mjs` | Update everything to latest, then verify |
 
 ## New laptop

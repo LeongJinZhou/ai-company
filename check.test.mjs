@@ -29,6 +29,14 @@ test('a project-scope install does not count', () => {
   assert.deepEqual(problems(wanted, installed), ['core@a: not installed']);
 });
 
+test('skills.txt is well formed', () => {
+  for (const row of rows('skills.txt')) {
+    assert.equal(row.length, 2, row.join(' '));
+    assert.match(row[0], /^[\w.-]+\/[\w.-]+$/);
+    assert.match(row[1], /^[\w-]+$/);
+  }
+});
+
 test('plugins.txt is well formed', () => {
   for (const row of rows('plugins.txt')) {
     assert.equal(row.length, 3, row.join(' '));
