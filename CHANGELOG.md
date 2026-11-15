@@ -4,6 +4,12 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+### Added
+- Hard rule: workers change files only with the Write or Edit tools
+
+### Changed
+- Lean workflow: tiers by diff (Tiny, Normal, Risky), a tool gate before any reviewer, one security review, re-checks scoped to the fix, sonnet for security-reviewer and tester on Normal tasks, and a lead that warns and waits when it is not on opus
+
 ## [1.0.0] - 2026-11-15
 
 ### Added

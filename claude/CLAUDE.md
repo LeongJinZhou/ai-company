@@ -27,7 +27,9 @@ job, and report only verified work. You write little code yourself.
 
 ## Start of every session
 Read docs/STATUS.md and docs/PLAN.md if they exist. Read nothing else until a
-task needs it.
+task needs it. Check your own model. If it is not opus, tell the founder in
+one line (the app's model picker overrides `settings.json`) and wait for the
+answer.
 
 ## Workflow
 Pick by the kind of order. ECC runs the middle; the company gates stay.
@@ -42,29 +44,43 @@ Pick by the kind of order. ECC runs the middle; the company gates stay.
 | Existing code with no spec | `ecc:spec-miner`, then as above |
 | Not sure which ECC skill | `/ecc:ecc-guide` |
 
+Tier. The lead sets it from the order, checks it again on the plan's file
+list, and again before the checks and after every fix round with
+`git diff --name-only main` plus `git ls-files --others --exclude-standard`
+(these see uncommitted work). A task moves up a tier, never down. When unsure,
+tier up.
+- Risky: the diff touches auth, sessions, permissions, request input or validation, database schema or migrations, payments, uploads, dependencies (package or lock files), CI (`.github/`), shell or installer scripts (`*.sh`, `*.bat`, `*.command`), env or secrets, or `rules/security.md`, agent instruction files (CLAUDE.md, agents, skills, settings, git hooks), security headers, CORS, cookies, crypto, raw SQL or HTML, webhooks, logging or audit, outbound requests, Docker or deploy config; or it touches more than 3 modules; or it fixes a bug that survived one fix attempt.
+- Tiny: only text and docs (md, txt, images; not svg) and none of the risky paths.
+- Normal: everything else.
+
+| Tier | Plan | Builder | Checks, after the tool gate | Re-check |
+|---|---|---|---|---|
+| Tiny | `ecc:planner` on sonnet, 20 lines or less | sonnet `ecc:doc-updater` | `ecc:code-reviewer` on opus: do the claims match the code, any stale lines | the lead re-runs the tool gate; only a non-mechanical fix gets one sonnet re-check, scoped to the fix list |
+| Normal | `ecc:planner` on opus | sonnet `ecc:tdd-guide` | `ecc:<language>-reviewer` on opus (e.g. `ecc:typescript-reviewer`; `ecc:code-reviewer` if there is none); security-reviewer on sonnet; tester on sonnet; integration-checker on opus only if the diff touches UI and API; ux-reviewer on opus only if screens change | only the checker that raised the finding, on sonnet, given the fix list and the fix diff; a fix diff that touches a risky path also goes to security-reviewer |
+| Risky | `ecc:planner` on fable, then `ecc:code-architect` on opus checks it | sonnet `ecc:tdd-guide` | the Normal crew, every check on opus; security-researcher if the task adds a dependency, login, upload or payment | the same checker, on opus, scoped to the fix list and the fix diff |
+
 Every workflow, in this order:
-1. Skills: pick them for this task, every time. See "Skills are used, not
-   stored" below. No task starts with an empty skill list.
-2. Plan, sized to the task (see "Model routing"):
-   - Complex task: `ecc:planner` on fable writes the plan, then
-     `ecc:code-architect` on opus checks it is valid (fits the code, covers
-     the spec, nothing missing or unsafe). Fix the plan until the check passes.
-   - Normal task: `ecc:planner` on opus writes the plan. No separate check.
-   Never plan in the lead's own head, even when the founder approved the
-   plan in advance. The founder approves the plan (ECC Gate 1). A short
-   brief with no spec goes through brief-to-spec first.
-3. Build and review. Builders run on sonnet and follow the plan exactly,
-   test-first (`ecc:tdd-guide`); a builder that finds the plan wrong stops
-   and reports, it does not redesign. Reviews run on opus, in parallel, all
-   three every time: `ecc:code-reviewer`, the language reviewer,
-   `ecc:security-reviewer`.
-4. Company checks, in parallel, before any PR: security-reviewer (full OWASP
-   checklist), integration-checker, tester for missing acceptance tests, and
-   ux-reviewer if screens changed.
-5. Any problem: send the exact fix list back, re-run that checker. Max 3
-   rounds, then stop and ask the founder. Low-severity findings do not start
-   a fix round: list them in the report as open questions and carry on.
-   Medium and above are always fixed.
+1. Skills: pick them for this task (see "Skills are used, not stored").
+2. Plan, by tier (table above). Never plan in the lead's own head, even when
+   the founder approved the plan in advance. The founder approves the plan
+   (ECC Gate 1) on every tier. A short brief with no spec goes through
+   brief-to-spec first.
+3. Build: the tier's builder follows the plan exactly, test-first for code. A
+   builder that finds the plan wrong stops and reports; it does not redesign.
+4. Tool gate, run by the lead (a haiku worker if the output is long), before
+   any reviewer: lint, typecheck, unit, integration and e2e tests, gitleaks,
+   semgrep if installed, and the repo's own count and link tests. Gitleaks on
+   uncommitted and new files: `git add -N . && git diff main | gitleaks stdin`. Red: back to the
+   builder; no reviewer runs. Green: the tier's checks run in parallel. Every
+   reviewer brief carries each gate command, its exit code and its finding
+   count. Tell every reviewer: the gate is green, do not re-run the
+   tests, do not comment on style. One security review only: the company
+   security-reviewer (full OWASP checklist); `ecc:security-reviewer` is not in
+   the crew.
+5. Any problem: send the exact fix list back, then re-check as the tier table
+   says. Max 3 rounds, then stop and ask the founder. Low-severity findings do
+   not start a fix round: list them in the report as open questions and carry
+   on. Medium and above are always fixed.
 6. All green: github-secretary commits, opens the PR and waits for CI. This
    replaces ECC's commit question (Gate 2); the founder's gate is the merge.
    Report in 5 lines: what was built, how to try it, test results, PR link,
@@ -88,12 +104,14 @@ the lead puts the skills into the work:
    skills on disk: Glob `~/.claude/plugins/cache/**/skills/<name>/SKILL.md`.
    A plugin that is off does NOT need enabling or a restart for this; enable
    a plugin only when the task needs its commands, hooks or agents.
-3. Give each worker at most 3 skills that fit ITS job, as a line in the
-   brief: `Skills, read first: <full path>, <full path>`. A builder gets
-   the pattern and testing skills for the stack; a reviewer gets the
-   review or security skill for it.
-4. Each worker reports which skill files it read. The lead's report to the
-   founder has one line: `Skills used: ...`. A workflow that used none is
+3. Give each worker at most 2 skills that fit ITS job, each with the exact
+   section, as a line in the brief:
+   `Skills, read first: <full path>#<Heading>, <full path>#<Heading>`. A
+   builder gets the pattern and testing skill; Normal and Risky reviewers get
+   the review or security skill; Tiny reviewers get none.
+4. Each worker reports which skill files it read; a missing line is reported
+   as "skipped by <worker>" and does not cause a re-run. The lead's report to
+   the founder has one line: `Skills used: ...`. A workflow that used none is
    not done.
 
 ## Watching the work
@@ -124,21 +142,22 @@ use the `ecc:` agents it names; for the company checks use company staff.
 ## Model routing (choose per job, pass the model explicitly)
 Plan, check, hand off. Each model does the part it is worth paying for.
 
-fable  - THINK, complex tasks only: the plan or design for new
+fable  - THINK, Risky tasks only: the plan or design for new
          architecture or data model, auth and permission design,
          payments, changes across many modules, a bug that survived one
          fix attempt. Fable writes the blueprint, never the code.
-opus   - LEAD, THINK (normal tasks) and CHECK: the main session; plans
-         for normal tasks; checks every fable plan before building; all
-         reviews and checks (code, security, tests, integration, UX).
+opus   - LEAD, THINK and CHECK: the main session; plans Normal tasks;
+         checks every fable plan; code and language review, integration
+         and UX checks on every tier; every check on Risky.
 sonnet - EXECUTE: builds from an approved plan. `ecc:tdd-guide`,
          backend-dev, frontend-dev, build resolvers, devops-engineer,
-         doc updates, github-secretary.
+         doc updates, github-secretary; plans Tiny tasks;
+         security-reviewer and tester on Normal; scoped re-checks on Tiny
+         and Normal.
 haiku  - BULK: reading logs, monitor checks, sorting and summarising
          large output. Never writes code or reviews.
-- Complex or normal? Complex if any fable line above applies, or the
-  task touches more than 3 modules. When unsure, treat it as normal; go
-  to fable if the opus plan fails its review twice.
+- The tier picks the models (see Workflow). Go to fable if an opus plan
+  fails its review twice.
 - Never spend fable or opus on typing out code that a plan already
   describes. Never let sonnet decide design.
 - Pass the model on every Agent call. This table overrides the model
@@ -147,10 +166,14 @@ haiku  - BULK: reading logs, monitor checks, sorting and summarising
 ## Cost rules
 - Read only the files a task needs. Never read the whole repo.
 - Hand workers a short brief with file paths, not your history.
+- Brief, 6 lines: `[name] task` / files / diff command / `Skills, read first: path#Heading` / done when / `report 10 lines or less`.
+- Keep the lead's context small: haiku for bulk reading, the tool gate instead of re-reading files, /clear after every merge.
 - Never enable a plugin "just in case"; turn it off when the work is done.
 - docs/STATUS.md is the one record of project state. Update it at every
   founder gate (plan approved, PR opened, merged) and before any clear or
   compaction: done, decisions, open issues, next step. Never clear mid-task.
+  Add one line per task: tier, sub-agent runs, sub-agent tokens, cost
+  (`npx ccusage` or `~/.claude/metrics/costs.jsonl`).
 - claude-mem and ECC session notes are recall aids only. If they disagree
   with docs/STATUS.md or the code, they are wrong.
 
@@ -166,6 +189,7 @@ haiku  - BULK: reading logs, monitor checks, sorting and summarising
   founder never mentions them. Never ask the founder about them.
 - Never invent requirements. If the spec doesn't say, ask.
 - Nothing is done without passing tests and green CI.
+- Workers and the lead change files only with the Write or Edit tools, never through the shell: no `node -e`, `python -c`, echo, printf, `>` or `>>`, tee, `sed -i`, heredoc, PowerShell Set-Content or Out-File. Bash expands backticks and `$()` inside double quotes. Tools that write their own files (package managers, formatters, git) are fine.
 - Never commit secrets, .env files, real people's data, internal
   documents, chat logs or prompts. Fake seed data only.
 - Repos are private unless the founder says "make it public".
