@@ -35,6 +35,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const [repo] of rows('refs.txt')) {
     if (!existsSync(join(dest, 'vendor', repo.split('/')[1], '.git'))) bad.push(`${repo}: reference repo missing`);
   }
+  for (const [repo, name] of rows('skills.txt')) {
+    if (!existsSync(join(dest, 'skills', name, 'SKILL.md'))) bad.push(`${repo}: skill ${name} missing`);
+  }
   for (const name of readdirSync(join(kit, 'claude', 'agents'))) {
     if (!existsSync(join(dest, 'agents', name))) bad.push(`agents/${name}: not linked into ${dest}`);
   }
@@ -45,5 +48,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.error('FAIL\n' + bad.map((b) => '  ' + b).join('\n'));
     process.exit(1);
   }
-  console.log(`OK: ${wanted.filter((r) => r[1] !== '-').length} plugins, ${rows('refs.txt').length} reference repos, handbook in place.`);
+  console.log(`OK: ${wanted.filter((r) => r[1] !== '-').length} plugins, ${rows('refs.txt').length} reference repos, ${rows('skills.txt').length} GitHub skills, handbook in place.`);
 }
