@@ -57,3 +57,15 @@ Plugins run their own hooks and code on your machine. Only add ones you trust.
 
 Edit files here, commit, push. Other laptops get it with `bash update.sh`.
 `node --test` runs the tests; CI runs them on every push.
+
+## Watching the agents
+
+Type `/myoffice` in Claude Code. A local page opens at `http://localhost:4545`
+showing every session and what it is doing. `/myoffice stop` closes it.
+
+First time in each browser: open **Settings** (gear, top right) and turn on
+**Subagents**. They are hidden by default, and without them the workers ECC
+sends out never appear. Turn on **Idle** as well to keep finished workers listed.
+
+The page shows your prompts and replies. Start it with `--private` before
+sharing your screen.
