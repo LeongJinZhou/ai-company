@@ -1,4 +1,8 @@
 {
+  "model": "opus",
+  "env": {
+    "ECC_GATEGUARD": "off"
+  },
   "attribution": {
     "commit": "",
     "pr": "",

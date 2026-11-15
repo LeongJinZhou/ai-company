@@ -2,7 +2,7 @@
 # Brings this laptop to the latest company setup. Safe to re-run any time:
 # pulls this repo, every marketplace, every plugin and every reference repo.
 #   bash update.sh          update, then check
-#   bash update.sh --check  only check that this machine matches plugins.txt
+#   bash update.sh --check  only check that this machine matches the repo (plugins, reference repos, skills, agents, handbook)
 # First-time setup is install-windows.bat / install-mac.command, which call this.
 set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

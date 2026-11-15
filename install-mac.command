@@ -20,4 +20,4 @@ gh auth status >/dev/null 2>&1 || gh auth login
 # Plugins, reference repos and the final check. Re-run update.sh any time to update.
 bash "$PWD/update.sh" --no-pull
 echo "Done. Merge claude/settings-additions.json into ~/.claude/settings.json if not done yet."
-echo "Then open a folder in VS Code, run: claude   and type: /model opusplan"
+echo "Then open a folder in VS Code and run: claude"
