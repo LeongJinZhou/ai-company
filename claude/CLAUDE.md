@@ -49,7 +49,7 @@ list, and again before the checks and after every fix round with
 `git diff --name-only main` plus `git ls-files --others --exclude-standard`
 (these see uncommitted work). A task moves up a tier, never down. When unsure,
 tier up.
-- Risky: the diff touches auth, sessions, permissions, request input or validation, database schema or migrations, payments, uploads, dependencies (package or lock files), CI (`.github/`), shell or installer scripts (`*.sh`, `*.bat`, `*.command`), env or secrets, or `rules/security.md`, agent instruction files (CLAUDE.md, agents, skills, settings, git hooks), security headers, CORS, cookies, crypto, raw SQL or HTML, webhooks, logging or audit, outbound requests, Docker or deploy config; or it touches more than 3 modules; or it fixes a bug that survived one fix attempt.
+- Risky: the diff touches auth, sessions, permissions, request input or validation at a trust boundary (HTTP or API handlers, forms, files, messages or data from outside the program; a local CLI's own arguments are not one unless the CLI is run by another program or service, or they reach a shell, eval, SQL, deserialisation or a file path outside the CLI's own data folder), database schema or migrations, payments, uploads, dependencies (package or lock files), CI (`.github/`), shell or installer scripts (`*.sh`, `*.bat`, `*.command`), env or secrets, or `rules/security.md`, agent instruction files (CLAUDE.md, agents, skills, settings, git hooks), security headers, CORS, cookies, crypto, raw SQL or HTML, shell commands, eval or deserialisation, webhooks, logging or audit, outbound requests, Docker or deploy config; or it touches more than 3 modules; or it fixes a bug that survived one fix attempt.
 - Tiny: only text and docs (md, txt, images; not svg) and none of the risky paths.
 - Normal: everything else.
 
@@ -167,7 +167,7 @@ haiku  - BULK: reading logs, monitor checks, sorting and summarising
 - Read only the files a task needs. Never read the whole repo.
 - Hand workers a short brief with file paths, not your history.
 - Brief, 6 lines: `[name] task` / files / diff command / `Skills, read first: path#Heading` / done when / `report 10 lines or less`.
-- Keep the lead's context small: haiku for bulk reading, the tool gate instead of re-reading files, /clear after every merge.
+- Lead turns are the biggest cost: each one re-reads the lead's whole context (about 75k tokens at the start). Batch them: run the whole tool gate in one Bash call that prints each command's exit code; send independent Agent calls, reads and edits in one message; use haiku for bulk reading; /clear after every merge.
 - Never enable a plugin "just in case"; turn it off when the work is done.
 - docs/STATUS.md is the one record of project state. Update it at every
   founder gate (plan approved, PR opened, merged) and before any clear or
