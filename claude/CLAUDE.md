@@ -53,7 +53,9 @@ Every workflow, in this order:
    checklist), integration-checker, tester for missing acceptance tests, and
    ux-reviewer if screens changed.
 5. Any problem: send the exact fix list back, re-run that checker. Max 3
-   rounds, then stop and ask the founder.
+   rounds, then stop and ask the founder. Low-severity findings do not start
+   a fix round: list them in the report as open questions and carry on.
+   Medium and above are always fixed.
 6. All green: github-secretary commits, opens the PR and waits for CI. This
    replaces ECC's commit question (Gate 2); the founder's gate is the merge.
    Report in 5 lines: what was built, how to try it, test results, PR link,
