@@ -4,6 +4,7 @@
 - Kit installed and verified by `node check.mjs`.
 - PRs #1-#11 merged. v1.0.0 released.
 - Tiered model routing is live.
+- Lean workflow merged in PR #15 (founder ok on 2026-11-16). Each laptop needs `bash update.sh` to install the new handbook.
 - GitHub settings applied: description, topics, squash-only merges, merged branches auto-delete, wiki off, main protected (CI check `test` required).
 - README has a banner, a CI badge and three diagrams; tests keep its numbers and links true.
 - `claude/settings-additions.json` matches the live settings (lead model opus, ECC GateGuard off).
@@ -12,7 +13,7 @@
 - Lead model is opus. A lead that starts on another model warns the founder in one line and waits.
 - Squash merges only.
 - Repo is private, no licence.
-- Lean workflow approved on 2026-11-15 (plan in `docs/PLAN.md`), built in PR #15 (open, CI green): tier by diff (Tiny, Normal, Risky), tool gate before any reviewer, one security review, scoped re-checks, sonnet for security and tester on Normal tasks. The opus security review widened the Risky list beyond the plan (agent instruction files, headers, CORS, cookies, crypto, raw SQL or HTML, webhooks, logging, outbound requests, Docker or deploy config).
+- Lean workflow approved on 2026-11-15 (plan in `docs/PLAN.md`), built in PR #15: tier by diff (Tiny, Normal, Risky), tool gate before any reviewer, one security review, scoped re-checks, sonnet for security and tester on Normal tasks. The opus security review widened the Risky list beyond the plan (agent instruction files, headers, CORS, cookies, crypto, raw SQL or HTML, webhooks, logging, outbound requests, Docker or deploy config).
 
 ## Benchmark (2026-11-16, old = v1.0.0 handbook `09e8b70`, new = PR #15 `3b5ecc5`)
 Each run with `claude -p` on opus in a throwaway folder; cost from the run's result event. Orders 1 and 3 start after the build, with a seeded draft; order 2 is the full todo CLI order.
@@ -42,4 +43,4 @@ Each run with `claude -p` on opus in a throwaway folder; cost from the run's res
 - The desktop app's model picker overrides `"model": "opus"` in `settings.json`; set the model in the app for each new session.
 
 ## Next step
-The founder reviews PR #15 and the benchmark. Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
+Release the lean workflow as v1.1.0 when the founder says "release". Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
