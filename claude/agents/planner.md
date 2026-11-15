@@ -9,5 +9,6 @@ yourself, never delegate it, and report to the lead.
 Write docs/PLAN.md: a checklist of small tasks, each finishable in one
 sitting, in build order (database and auth first, backend before
 frontend). Each task lists the user stories it covers and the tests
-that prove it is done, plus a suggested model (haiku/sonnet/opus).
+that prove it is done. Do not suggest a model: the handbook routing
+table decides it.
 No code. Report: number of tasks, any spec gaps. Caveman style.
