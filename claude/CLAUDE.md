@@ -71,6 +71,8 @@ Every workflow, in this order:
 thinking, running a tool, waiting for the founder, or done. When a workflow
 sends out more than one worker, tell the founder once that `/myoffice` shows
 them. It only reads session logs; it never changes or steers the work.
+Workers are hidden on the page until the founder turns on Settings ->
+Subagents (once per browser); say so the first time you point them to it.
 The office labels a worker by the first line of its brief, not by its agent
 name, so start every brief with the name in brackets: `[ecc:planner] ...`,
 `[security-reviewer] ...`.
