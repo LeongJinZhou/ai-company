@@ -4,6 +4,8 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-15
+
 ### Added
 - Initial company setup: handbook, rules, staff agents, skills, templates, installers (before #1)
 - ECC-led company kit with plugins and one-command update (#1)
@@ -14,7 +16,7 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 ### Changed
 - Say that myoffice hides sub-agents until Subagents is turned on (#4)
 - Low-severity findings do not start a fix round (#7)
-- Repo polish: README with banner and diagrams, settings in sync, PR template, Dependabot, changelog, Mac installer no longer suggests opusplan
+- Repo polish: README with banner and diagrams, settings in sync, PR template, Dependabot, changelog, Mac installer no longer suggests opusplan (#11)
 
 ### Fixed
 - Handbook weak spots found in the ECC review (#2)
