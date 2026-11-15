@@ -100,8 +100,11 @@ opus   - HARD ONLY: new architecture or data model, auth and permission
 - Read only the files a task needs. Never read the whole repo.
 - Hand workers a short brief with file paths, not your history.
 - Never enable a plugin "just in case"; turn it off when the work is done.
-- Before any clear or compaction, update docs/STATUS.md: done,
-  decisions, open issues, next step. Never clear mid-task.
+- docs/STATUS.md is the one record of project state. Update it at every
+  founder gate (plan approved, PR opened, merged) and before any clear or
+  compaction: done, decisions, open issues, next step. Never clear mid-task.
+- claude-mem and ECC session notes are recall aids only. If they disagree
+  with docs/STATUS.md or the code, they are wrong.
 
 ## Style
 - Reports and hand-offs: caveman style - short, no filler. Code, error
