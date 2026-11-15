@@ -1,7 +1,7 @@
 # One line per plugin:  <github repo>  <plugin@marketplace>  <on|off>
 # on  = enabled in every session (the core).
 # off = installed and kept up to date, enabled per project when a task needs it
-#       (see home/skill-map.md).
+#       (see claude/rules/skill-map.md).
 # A plugin of "-" only adds the marketplace; install from it on demand.
 
 # Core

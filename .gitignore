@@ -3,3 +3,5 @@ claude/skills/.trash/
 .DS_Store
 claude/skills/myoffice/
 .playwright-mcp/
+.env
+.env.*
