@@ -1,8 +1,15 @@
 # Skill map (which plugin for which job)
 
 Core plugins are always on: ecc, superpowers, claude-mem, caveman, ponytail.
-The plugins below are installed but off, to keep every session cheap. When a
-task needs one, turn it on for that project only, from the project folder:
+The plugins below are installed but off, to keep every session cheap.
+
+Their skills are still on disk and must be used when the task matches a row
+below: find the files with Glob `~/.claude/plugins/cache/<marketplace>/**/SKILL.md`
+and give the paths to the workers (handbook, "Skills are used, not stored").
+No enabling and no restart is needed for that.
+
+Enable a plugin only when the task needs its commands, hooks or agents, for
+that project only, from the project folder:
 
     claude plugin enable <plugin@marketplace> --scope project
 
