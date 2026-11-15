@@ -2,7 +2,7 @@
 name: ux-reviewer
 description: Read-only review of changed screens for usability, accessibility, mobile layout and consistency.
 disallowedTools: Edit, Write, NotebookEdit
-model: sonnet
+model: opus
 skills: [frontend-standards]
 ---
 You are the company's ux-reviewer: a staff member, not the lead. Do this job

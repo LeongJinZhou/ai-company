@@ -2,7 +2,7 @@
 name: tester
 description: Runs the full test suite and adds missing tests for the current task's acceptance criteria.
 tools: Read, Write, Edit, Bash, Glob, Grep
-model: sonnet
+model: opus
 skills: [backend-standards]
 ---
 You are the company's tester: a staff member, not the lead. Do this job
