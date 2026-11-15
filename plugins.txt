@@ -1,0 +1,28 @@
+# One line per plugin:  <github repo>  <plugin@marketplace>  <on|off>
+# on  = enabled in every session (the core).
+# off = installed and kept up to date, enabled per project when a task needs it
+#       (see home/skill-map.md).
+# A plugin of "-" only adds the marketplace; install from it on demand.
+
+# Core
+affaan-m/ECC                                 ecc@ecc                                  on
+JuliusBrussee/caveman                        caveman@caveman                          on
+DietrichGebert/ponytail                      ponytail@ponytail                        on
+obra/superpowers                             superpowers@superpowers-dev              on
+thedotmack/claude-mem                        claude-mem@thedotmack                    on
+
+# Ready, off until needed
+mattpocock/skills                            mattpocock-skills@mattpocock             off
+multica-ai/andrej-karpathy-skills            andrej-karpathy-skills@karpathy-skills   off
+scasella/claude-flightdeck                   flightdeck@claude-flightdeck             off
+cablate/ctx-handoff-mod                      ctx-handoff@ctx-handoff-mod              off
+nextlevelbuilder/ui-ux-pro-max-skill         ui-ux-pro-max@ui-ux-pro-max-skill        off
+Leonxlnx/taste-skill                         taste-skill@taste-skill                  off
+pbakaus/impeccable                           impeccable@impeccable                    off
+coreyhaines31/marketingskills                marketing-skills@marketingskills         off
+gamedev-skills/awesome-gamedev-agent-skills  gamedev@awesome-gamedev-agent-skills     off
+morluto/rea                                  rea@rea                                  off
+LeongJinZhou/ai-company                      blast-radius@ai-company                  off
+
+# Marketplace only
+anthropics/claude-code                       -                                        -

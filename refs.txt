@@ -1,0 +1,6 @@
+# Reference repos that are not Claude Code plugins. Shallow-cloned into
+# ~/.claude/vendor/<name> and pulled on every install run. Read on demand only.
+OpenMontageInc/OpenMontage
+shanraisshan/claude-code-best-practice
+wesammustafa/Claude-Code-Quest
+VoltAgent/awesome-design-md
