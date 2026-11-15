@@ -69,3 +69,21 @@ sends out never appear. Turn on **Idle** as well to keep finished workers listed
 
 The page shows your prompts and replies. Start it with `--private` before
 sharing your screen.
+
+### From your phone (private)
+
+The office answers only on the laptop itself. To open it from your own phone,
+without putting it on the public internet, use Tailscale (free):
+
+1. Install Tailscale on the laptop and the phone; sign in to the same account
+   on both.
+2. On the laptop, once: `"%ProgramFiles%\Tailscale\tailscale.exe" serve --bg --http=80 4546`
+3. Run `office-remote.cmd`. To start it at every login, put a file in the
+   Windows Startup folder that calls it.
+4. On the phone open `http://<laptop-name>.<tailnet>.ts.net/` and bookmark it.
+   `tailscale status` on the laptop shows the name.
+
+Only devices signed in to your Tailscale account can open that link. The
+laptop must be on. `office-proxy.mjs` is the small forwarder that makes this
+work; it refuses every address that is not a `.ts.net` name. Windows only for
+now. Never use `tailscale funnel` for this: that would make the page public.
