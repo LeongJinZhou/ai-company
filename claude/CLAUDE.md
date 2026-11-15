@@ -45,10 +45,13 @@ Pick by the kind of order. ECC runs the middle; the company gates stay.
 Every workflow, in this order:
 1. Skills: check the skill map. If the task needs a plugin that is off,
    enable it for the project and ask the founder to restart the session.
-2. ECC plans. The founder approves the plan (ECC Gate 1). A short brief with
-   no spec goes through brief-to-spec first.
-3. ECC builds test-first (`ecc:tdd-guide`) and reviews (`ecc:code-reviewer`,
-   language reviewers, `ecc:security-reviewer`).
+2. ECC plans: always send `ecc:planner`, never plan in the lead's own head,
+   even when the founder approved the plan in advance. The founder approves
+   the plan (ECC Gate 1). A short brief with no spec goes through
+   brief-to-spec first.
+3. ECC builds test-first (`ecc:tdd-guide`) and reviews. All three reviews are
+   sent every time, none is optional: `ecc:code-reviewer`, the language
+   reviewer, `ecc:security-reviewer`.
 4. Company checks, in parallel, before any PR: security-reviewer (full OWASP
    checklist), integration-checker, tester for missing acceptance tests, and
    ux-reviewer if screens changed.
@@ -94,20 +97,16 @@ agent of the same name is always written `ecc:<name>`. Inside an ECC workflow
 use the `ecc:` agents it names; for the company checks use company staff.
 
 ## Model routing (choose per job, pass the model explicitly)
-haiku  - SIMPLE: rename, copy change, small style fix, run tests and
-         summarise, status reports, reading logs, monitor checks,
-         commit messages, git and GitHub chores.
-sonnet - STANDARD (default): normal features following a pattern, CRUD,
-         writing tests, code review, security checklist review, UX
-         review, devops tasks.
-opus   - HARD ONLY: new architecture or data model, auth and permission
-         design, payments, bugs that failed one sonnet attempt, high or
-         critical security findings with an unclear fix, changes across
-         many modules.
-- When unsure, start one level lower; escalate only if the job fails
-  or a reviewer rejects it twice.
-- Never use opus for reading, searching, summarising or reporting.
-- This table overrides the model named in any ECC agent file.
+fable  - THINK: the lead itself, and every planning job (`ecc:planner`,
+         planner). Decides how the work is done.
+opus   - DO AND CHECK (default): every other worker. Building, tests,
+         code review, security review, integration and UX checks,
+         devops, monitoring. Every evaluation and double-check is opus.
+sonnet - GITHUB ONLY: github-secretary (branches, commits, PRs, merges,
+         releases). Nothing else runs on sonnet.
+- haiku is not used.
+- Pass the model on every Agent call. This table overrides the model
+  named in any ECC agent file.
 
 ## Cost rules
 - Read only the files a task needs. Never read the whole repo.

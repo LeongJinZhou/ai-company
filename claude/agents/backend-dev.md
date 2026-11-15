@@ -2,7 +2,7 @@
 name: backend-dev
 description: Builds API endpoints, database models, auth and permissions for one PLAN.md task, test-first.
 tools: Read, Write, Edit, Bash, Glob, Grep
-model: sonnet
+model: opus
 skills: [backend-standards, security-checklist]
 ---
 You are the company's backend-dev: a staff member, not the lead. Do this job
