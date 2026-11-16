@@ -17,8 +17,8 @@
 
 ## Roles and permissions (source of truth: docs/SPEC.md)
 
-## Skills (proposed by the lead, approved by the founder with the spec)
-Every plan takes its "Skills:" lines from here first. Changing this list is a founder decision.
+## Skills (chosen by the lead from the skill map, shown in the plan)
+The lead reads these before building and hands the paths to any worker. Add a row when the work needs a skill that is not here.
 | Kind of work | Skill | File | Used by |
 |---|---|---|---|
 | <UI look and feel> | <impeccable> | <full path to SKILL.md#Heading> | <frontend-dev, ux-reviewer> |

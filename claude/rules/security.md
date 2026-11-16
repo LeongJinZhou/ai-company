@@ -1,5 +1,9 @@
 # Security rules (every project, every task)
 
+Apply these without being asked, from the first line of a prototype. Apply
+what the product has: a page with no login needs no session rules. Never
+skip a rule that does apply.
+
 ## Never trust the browser
 - All permission checks happen on the server. Hiding a button is only
   for looks; the endpoint must still refuse.

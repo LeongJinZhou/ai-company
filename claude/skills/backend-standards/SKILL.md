@@ -1,6 +1,6 @@
 ---
 name: backend-standards
-description: Backend architecture, logic, testing and performance standards for large organisations. Use when designing, building or testing server code.
+description: Backend architecture, logic, testing and performance standards. Use when designing, building or testing server code.
 ---
 Structure
 - Route -> validation -> service (business rules) -> data access.
@@ -11,7 +11,8 @@ Data
 - Schema changes only through migrations.
 - The database enforces rules too: NOT NULL, UNIQUE, foreign keys.
 - Multi-step writes run in one transaction.
-- organisation_id on owned tables; indexes on filter/sort columns.
+- Indexes on foreign keys and on filter/sort columns.
+- Several organisations or many users: the scale-standards skill.
 Testing
 - Test first. Every business rule has unit tests with edge cases.
 - Integration tests run against a real test database.

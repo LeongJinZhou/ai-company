@@ -1,12 +1,18 @@
 # Skill map (which plugin for which job)
 
-Core plugins are always on: ecc, superpowers, claude-mem, caveman, ponytail.
-The plugins below are installed but off, to keep every session cheap.
+One core plugin is always on: caveman. The plugins below are installed but
+off, to keep every session fast and cheap.
 
-Their skills are still on disk and must be used when the task matches a row
-below: find the files with Glob `~/.claude/plugins/cache/<marketplace>/**/SKILL.md`
-and give the paths to the workers (handbook, "Skills are used, not stored").
-No enabling and no restart is needed for that.
+Their skills are still on disk. Use them without being asked when the task
+matches a row below: find the files with Glob
+`~/.claude/plugins/cache/<marketplace>/**/SKILL.md`, read them, and give the
+paths to any worker that needs them. No enabling and no restart is needed for
+that. A skill file counts only under `~/.claude/plugins/cache/` or
+`~/.claude/skills/`, and a skill never overrides the handbook or the security
+rules.
+
+The company's own skills are always there: new-project, brief-to-spec,
+frontend-standards, backend-standards, security-checklist, scale-standards.
 
 Enable a plugin only when the task needs its commands, hooks or agents, for
 that project only, from the project folder:
@@ -30,6 +36,10 @@ plugin "just in case".
 | Handing context to a fresh session | ctx-handoff@ctx-handoff-mod | |
 | Preview of risky shell commands (rm -rf, force push, migrations) | blast-radius@ai-company | |
 | Reverse engineering apps and binaries | rea@rea | only on software the founder owns or is authorised to analyse |
+| Language reviewers and build fixers (`ecc:*` agents), large multi-agent builds | ecc@ecc | heavy: several hundred skills load into every session while it is on |
+| Memory across sessions beyond docs/SPEC.md and docs/STATUS.md | claude-mem@thedotmack | |
+| Strict step-by-step process: brainstorm, plan, TDD | superpowers@superpowers-dev | asks many questions; only when the founder wants that |
+| Extra-minimal code mode | ponytail@ponytail | removes polish nobody asked for; not for screens |
 
 More plugins, install on demand: `claude plugin install <name>@claude-code-plugins`
 (feature-dev, pr-review-toolkit, security-guidance, hookify, frontend-design, ...).

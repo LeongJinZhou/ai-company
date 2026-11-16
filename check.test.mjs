@@ -5,6 +5,11 @@ import { test } from 'node:test';
 import { problems, rows } from './check.mjs';
 
 const here = (p) => join(import.meta.dirname, p);
+const read = (p) => readFileSync(here(p), 'utf8');
+// One "## Heading" or "### Heading" section of a markdown file, up to the next heading.
+const section = (md, heading) =>
+  (md.match(new RegExp(`^#{2,3} ${heading}[^\\n]*\\n[\\s\\S]*?(?=^#{2,3} |(?![\\s\\S]))`, 'm')) || [''])[0];
+const all = (text, patterns) => { for (const re of patterns) assert.match(text, re); };
 
 const wanted = [
   ['a/a', 'core@a', 'on'],
@@ -50,14 +55,29 @@ test('plugins.txt is well formed', () => {
   }
 });
 
+test('the core stays small: heavy plugins are off but can be found', () => {
+  const state = Object.fromEntries(rows('plugins.txt').map((r) => [r[1], r[2]]));
+  assert.equal(state['caveman@caveman'], 'on');
+  const on = Object.values(state).filter((s) => s === 'on').length;
+  assert.ok(on <= 2, `${on} plugins are on; every one loads into every session`);
+  const map = read('claude/rules/skill-map.md');
+  for (const id of ['ecc@ecc', 'superpowers@superpowers-dev', 'claude-mem@thedotmack', 'ponytail@ponytail']) {
+    assert.equal(state[id], 'off', id);
+    assert.ok(map.includes(`| ${id} |`), `skill map has no row for ${id}`);
+  }
+  assert.match(map, /\| impeccable@impeccable \| first choice for screens \|/);
+  assert.match(map, /counts only under `~\/\.claude\/plugins\/cache\/` or\s+`~\/\.claude\/skills\/`/);
+  assert.match(map, /never overrides the handbook or the security\s+rules/);
+});
+
 test('settings-additions.json sets the lead model and turns GateGuard off', () => {
-  const s = JSON.parse(readFileSync(here('claude/settings-additions.json'), 'utf8'));
+  const s = JSON.parse(read('claude/settings-additions.json'));
   assert.equal(s.model, 'opus');
   assert.equal(s.env?.ECC_GATEGUARD, 'off');
 });
 
 test('README counts match the files', () => {
-  const readme = readFileSync(here('README.md'), 'utf8');
+  const readme = read('README.md');
   const each = (re, expected) => {
     const hits = [...readme.matchAll(re)];
     assert.ok(hits.length > 0, `README has no match for ${re}`);
@@ -70,12 +90,12 @@ test('README counts match the files', () => {
     /(\d+) company skills/g,
     readdirSync(here('claude/skills')).filter((d) => existsSync(here(`claude/skills/${d}/SKILL.md`)) && !external.has(d)).length,
   );
-  each(/(\d+) core plugins/g, plugins.filter((r) => r[2] === 'on').length);
+  each(/(\d+) core plugins?\b/g, plugins.filter((r) => r[2] === 'on').length);
   each(/(\d+) plugins that are off/g, plugins.filter((r) => r[2] === 'off').length);
 });
 
 test('every relative link in README.md exists', () => {
-  const readme = readFileSync(here('README.md'), 'utf8').replace(/```[\s\S]*?```/g, '');
+  const readme = read('README.md').replace(/```[\s\S]*?```/g, '');
   const re = /\]\(([^)\s]+)(?:\s+"[^"]*")?\)|(?:src|href)=["']([^"']+)["']/g;
   const targets = [...readme.matchAll(re)].map((m) => m[1] || m[2]);
   assert.ok(targets.length > 0, 'README has no links');
@@ -87,198 +107,147 @@ test('every relative link in README.md exists', () => {
 });
 
 test('README has the banner, the CI badge and three diagrams', () => {
-  const readme = readFileSync(here('README.md'), 'utf8');
+  const readme = read('README.md');
   assert.ok(readme.includes('src="docs/assets/banner.svg"'));
   assert.ok(readme.includes('actions/workflows/ci.yml/badge.svg'));
   assert.equal((readme.match(/```mermaid/g) || []).length, 3);
 });
 
-test('handbook names the tiers and the risky paths', () => {
-  const md = readFileSync(here('claude/CLAUDE.md'), 'utf8');
-  // each tier needs its own definition bullet, not just a mention in the table
-  for (const w of ['Tiny', 'Normal', 'Risky']) assert.match(md, new RegExp(`^- ${w}: \\S`, 'm'), `handbook lacks "- ${w}:" bullet`);
-  const risky = (md.match(/^- Risky:[\s\S]*?(?=\n\s*\n|\n- |(?![\s\S]))/m) || [''])[0].toLowerCase();
-  assert.ok(risky, 'no "- Risky:" paragraph');
-  for (const re of [/auth/, /migration/, /payment/, /dependenc/, /\bci\b/, /script/]) assert.match(risky, re);
-  for (const re of [/plugins\.txt/, /skills\.txt/, /refs\.txt/, /\*\.cmd/, /\*\.ps1/, /`rules\/`/, /`templates\/`/]) assert.match(risky, re);
-  for (const re of [/\*\.sh/, /\*\.bat/, /\*\.command/, /agent instruction files/, /`\.github\/`/]) assert.match(risky, re);
-  const tiny = (md.match(/^- Tiny:[\s\S]*?(?=\n\s*\n|\n- |(?![\s\S]))/m) || [''])[0].toLowerCase();
-  assert.match(tiny, /md, txt/); assert.match(tiny, /whatever its extension/);
+test('README diagram 2 shows the five steps and the one yes', () => {
+  const blocks = [...read('README.md').matchAll(/```mermaid([\s\S]*?)```/g)].map((m) => m[1]);
+  assert.equal(blocks.length, 3);
+  all(blocks[1], [/1\. Study/, /2\. Propose/, /Founder says yes\?/, /3\. Build/, /4\. Check itself/, /5\. Show/, /only on the founder's word/]);
+  assert.doesNotMatch(read('README.md'), /founder-proxy|\bTiny\b|\bRisky\b/);
 });
 
-test('agent models match the routing table', () => {
+test('handbook has the five steps, in order', () => {
+  const md = read('claude/CLAUDE.md');
+  const heads = ['### 1. Study', '### 2. Propose: one short plan, one yes', '### 3. Build', '### 4. Check yourself, before the founder sees it', '### 5. Show'];
+  const at = heads.map((h) => md.indexOf(`\n${h}\n`));
+  for (const [i, pos] of at.entries()) assert.ok(pos > 0, `handbook lacks "${heads[i]}"`);
+  assert.deepEqual([...at].sort((a, b) => a - b), at);
+});
+
+test('the founder is never interviewed and says yes once', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, '1\\. Study'), [/Never interview the founder/, /Run it and look at it as it is today/, /what the founder did not say but the product needs/]);
+  all(section(md, '2\\. Propose'), [
+    /At most 15 lines/, /mark each\s+"added"/, /what must stay on the server/, /Left out, and why/, /Skills: the skill files this work will use/,
+    /wait for the founder's yes/, /do not plan again from zero/, /A small order [^.]* needs no plan/, /That is the only kind of question/,
+  ]);
+  const bts = read('claude/skills/brief-to-spec/SKILL.md');
+  all(bts, [/Do not ask the founder to choose/, /without interviewing the founder/, /^10\. Slices/m, /^11\. Look and theme/m, /never drop section 7/, /under\s+`## Skills`/, /Wait for the founder's yes/]);
+  assert.doesNotMatch(bts, /questions per round|multiple-choice/);
+  assert.match(read('claude/skills/new-project/SKILL.md'), /## Skills/);
+  assert.match(read('claude/templates/project-CLAUDE.md'), /^## Skills/m);
+});
+
+test('every screen gets a design skill, fitting motion and every state', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, '3\\. Build'), [
+    /Any screen: a design skill\s+from the skill map \(impeccable first\) and frontend-standards/, /Read the plan's skill files before writing/,
+    /Motion where it helps/, /none where it distracts \(login, forms,\s+settings\)/, /hover, pressed, focus, empty, loading, error/,
+    /Phone and big screen/, /never emoji/,
+  ]);
+  all(section(md, '4\\. Check yourself'), [/use every feature in a real browser/, /generic or AI-made/, /ux-reviewer/, /Read your own diff as a reviewer/, /Tests and lint pass/]);
+  all(section(md, '5\\. Show'), [/A screenshot or a local URL/, /at most 8 lines/, /"tests pass" is not "good"/]);
+});
+
+test('security is always on, scale only when the product needs it', () => {
+  const md = read('claude/CLAUDE.md');
+  for (const rule of ['security', 'testing', 'skill-map']) assert.match(md, new RegExp(`^@~/\\.claude/rules/${rule}\\.md$`, 'm'));
+  assert.doesNotMatch(md, /^@.*scale\.md/m);
+  all(section(md, 'Scale'), [/scale-standards skill only when docs\/SPEC\.md says/, /does not get\s+multi-tenant tables/]);
+  // Every file in claude/rules/ loads into every session, so the scale rules live in a skill, read on demand.
+  assert.ok(!existsSync(here('claude/rules/scale.md')), 'scale.md is back in the always-loaded rules folder');
+  all(read('claude/skills/scale-standards/SKILL.md'), [/^description: .*Use only when docs\/SPEC\.md says/m, /never for a prototype/, /organisation_id/, /paginated on the server/]);
+  assert.doesNotMatch(read('claude/skills/backend-standards/SKILL.md'), /organisation_id|large organisations/);
+  all(read('claude/rules/security.md'), [/from the first line of a prototype/, /Never\s+skip a rule that does apply/, /parameterised queries/, /No secrets in frontend code/]);
+  all(section(md, '3\\. Build'), [/Server\s+code: backend-standards and security-checklist/, /apply from the first\s+line of a prototype/, /Secrets, tokens, keys and anything worth stealing\s+live on the server/]);
+  all(section(md, '4\\. Check yourself'), [/against the security-checklist skill/, /Login,\s+payment, upload, personal data or a new dependency also goes to\s+security-reviewer/, /security-researcher/]);
+});
+
+test('code stays in order and one feature is not a chain of agents', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, '3\\. Build'), [
+    /The lead builds/, /Never a chain of planner, approver and builder/, /one job per file/, /no dead\s+code, no copy-pasted blocks/,
+    /smallest change that fully does the job/, /Never cut validation, permission checks, error handling or tests/,
+  ]);
+  assert.doesNotMatch(md, /founder-proxy|\bTiny\b|\bRisky\b|\btiers?\b|ecc:/i);
+  assert.ok(!existsSync(here('claude/agents/founder-proxy.md')), 'founder-proxy is back');
+  all(section(md, 'Staff'), [/you are not the lead/, /never delegate it/, /10\s+lines or less/, /a short brief with file paths/]);
+});
+
+test('testing grows with the product', () => {
+  const t = read('claude/rules/testing.md');
+  all(t, [/^## Prototype \(the default\)$/m, /^## Before real users or real data$/m, /Never delete, skip or weaken a test/, /the failing test first/, /clicked through in a real browser/, /80%\+/, /CI on GitHub green/]);
+});
+
+test('only the founder decides outward and irreversible actions', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, 'Only the founder decides'), [
+    /deploying to production/, /deleting data, a repo or a\s+branch with unmerged work/, /a force push/, /making a repo public/,
+    /messages to real people/, /a paid service/, /secrets and credentials/, /Commit,\s+push, merge and release happen on the founder's word/,
+    /Changing the company itself/, /needs the founder's yes to a change described in plain\s+words first/,
+  ]);
+  const sec = read('claude/agents/github-secretary.md');
+  all(sec, [
+    /the founder has said to commit,\s+push, merge or release/, /gh pr merge <n> --squash --delete-branch --match-head-commit <sha>/, /Refuse to merge/,
+    /if that commit is not the PR head/, /git tag -a vX\.Y\.Z <sha>/, /CHANGELOG\.md was updated and merged before the release/, /Refuse to tag if/,
+    /if main has moved past that commit/, /Never commit it/,
+  ]);
+  assert.doesNotMatch(sec, /founder-proxy|\bTiny\b/);
+  assert.doesNotMatch(sec, /update CHANGELOG\.md/);
+});
+
+test('hard rules forbid shell file writes and false claims', () => {
+  const rules = section(read('claude/CLAUDE.md'), 'Hard rules');
+  assert.ok(rules, 'no Hard rules section');
+  assert.match(rules, /\bWrite\b/);
+  assert.match(rules, /\bEdit\b/);
+  assert.ok(rules.includes('node -e'), 'no "node -e"');
+  assert.match(rules, /heredoc/i);
+  all(rules, [
+    /only with the Write or Edit tools, never through the shell/, /unless you ran it and saw it work/, /Never delete, skip or weaken a test/,
+    /Never commit secrets, \.env files, real people's data/, /Repos are private/, /Three failed tries/,
+  ]);
+});
+
+test('agent models are pinned', () => {
   const models = {
-    architect: 'fable', 'backend-dev': 'sonnet', 'devops-engineer': 'sonnet', 'founder-proxy': 'fable', 'frontend-dev': 'sonnet',
+    architect: 'fable', 'backend-dev': 'sonnet', 'devops-engineer': 'sonnet', 'frontend-dev': 'sonnet',
     'github-secretary': 'sonnet', 'integration-checker': 'opus', planner: 'opus', 'security-researcher': 'opus',
     'security-reviewer': 'opus', 'site-monitor': 'haiku', tester: 'sonnet', 'ux-reviewer': 'opus',
   };
   const files = readdirSync(here('claude/agents')).filter((f) => f.endsWith('.md'));
   assert.deepEqual(files.map((f) => f.slice(0, -3)).sort(), Object.keys(models).sort());
   for (const f of files) {
-    const front = (readFileSync(here(`claude/agents/${f}`), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
-    const m = front.match(/^model:\s*(\S+)/m);
-    assert.equal(m?.[1], models[f.slice(0, -3)], `${f} model`);
+    const text = read(`claude/agents/${f}`);
+    const front = (text.match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
+    assert.equal(front.match(/^model:\s*(\S+)/m)?.[1], models[f.slice(0, -3)], `${f} model`);
+    assert.doesNotMatch(text, /founder-proxy|\bTiny\b|\bRisky\b|routing table/, `${f} still names the old workflow`);
   }
 });
 
-test('hard rules forbid shell file writes', () => {
-  const md = readFileSync(here('claude/CLAUDE.md'), 'utf8');
-  const rules = (md.match(/^## Hard rules[\s\S]*?(?=^## |(?![\s\S]))/m) || [''])[0];
-  assert.ok(rules, 'no Hard rules section');
-  assert.match(rules, /\bWrite\b/);
-  assert.match(rules, /\bEdit\b/);
-  assert.ok(rules.includes('node -e'), 'no "node -e"');
-  assert.match(rules, /heredoc/i);
-  assert.match(rules, /only with the Write or Edit tools, never through the shell/);
-});
-
-test('README diagram 2 shows tiers and the tool gate', () => {
-  const blocks = [...readFileSync(here('README.md'), 'utf8').matchAll(/```mermaid([\s\S]*?)```/g)].map((m) => m[1]);
-  assert.equal(blocks.length, 3);
-  assert.ok(blocks[1].includes('Tier'), 'diagram 2 lacks Tier');
-  assert.match(blocks[1], /tool gate/i);
-  assert.match(blocks[0], /founder-proxy/);
-  assert.match(blocks[1], /founder-proxy/);
-  assert.match(blocks[1], /Tiny/);
-  assert.match(blocks[1], /Skills line/);
-  assert.match(blocks[1], /\(Tiny: the lead's must-escalate check\)/);
-});
-
-test('handbook names the founder gates and the must-escalate list', () => {
-  const md = readFileSync(here('claude/CLAUDE.md'), 'utf8');
-  const raw = (md.match(/^## Founder gates[\s\S]*?(?=^## |(?![\s\S]))/m) || [''])[0];
-  const gates = raw.toLowerCase();
-  assert.ok(gates, 'no Founder gates section');
-  for (const re of [
-    /APPROVE, CHANGES \(numbered list\) or ESCALATE/,
-    /only for the item it names: a plan by its path and `git hash-object` hash, a merge by the PR head commit, a release by the version and the main commit/,
-    /An edited plan, a new commit or a moved main needs a new decision/,
-    /ORDERS cover only what this task needs to be complete/,
-    /They never add a feature/,
-    /A hit goes to the founder; founder-proxy is not asked/,
-    /A third CHANGES on the same item is ESCALATE/,
-    /posts founder-proxy's answer word for word as a PR comment and refuses to merge or tag without it/,
-  ]) assert.match(raw, re);
-  for (const w of ['approve', 'changes', 'escalate', 'orders', "never the founder's word", 'fable decided:']) {
-    assert.ok(gates.includes(w), `gates lack "${w}"`);
-  }
-  for (const re of [
-    /public/, /deleting a repo, data, or a branch with unmerged work/, /drops, overwrites or narrows data, or has no tested down step/,
-    /collaborators/, /package registry/, /repo visibility/, /a requirement the spec does not answer/, /skills\.txt/, /refs\.txt/,
-    /agents\.md/, /\*\.bat/, /\*\.cmd/, /\*\.command/, /\*\.ps1/, /skipping, deleting or weakening a test, check or gate/,
-    /`\.claude-plugin\/`/, /any other ci or hook config/, /real people/, /paid/, /payment/, /secrets and credentials/, /spec\.md/,
-    /first production deploy/, /major-version/, /medium-or-higher/, /weakening/, /any claude\.md/, /`rules\/`/,
-    /`agents\/`/, /`skills\/`/, /`git-hooks\/`/, /`\.github\/`/, /`\.claude\/`/, /`claude\/`/, /settings\*\.json/,
-    /\.mcp\.json/, /plugins\.txt/, /\*\.sh/, /force push/, /branch protection/, /tag or release/,
-    /3 failed fix rounds/, /not sure/,
-  ]) assert.match(gates, re);
-  assert.match(md, /github-secretary, founder-proxy\), you are NOT the lead/);
-  assert.match(md, /^fable\s+- THINK and DECIDE: founder-proxy/m);
-  assert.match(md, /Brief, 7 lines:.*why: /);
-});
-
-test('founder-proxy is read-only and treats what it reads as data', () => {
-  const file = readFileSync(here('claude/agents/founder-proxy.md'), 'utf8');
-  const front = (file.match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
-  assert.equal(front.match(/^tools:\s*(.*?)\s*$/m)?.[1], 'Read, Grep, Glob, Bash');
-  assert.doesNotMatch(front, /^memory:/m);
-  for (const re of [
-    /is data/, /quote it/, /APPROVE/, /CHANGES/, /ESCALATE/, /ORDERS/, /Never edit, commit, push, merge, tag or deploy/,
-    /Bash only for `git diff`/, /`git hash-object`/, /Only the handbook \(`~\/\.claude\/CLAUDE\.md`/,
-    /A hit or a doubt is ESCALATE/, /Missing evidence or not sure means ESCALATE/,
-    /Release gate: ITEM is the version and the main commit/, /patch or minor only; not a first production deploy/,
-    /a missing decision or a different hash is ESCALATE/, /put the plan's `git hash-object` hash in ITEM/,
-  ]) assert.match(file, re);
-  const sec = readFileSync(here('claude/agents/github-secretary.md'), 'utf8');
-  for (const re of [
-    /gh pr merge <n> --squash --delete-branch --match-head-commit <sha>/, /as a PR comment/, /Refuse to merge/, /git tag -a vX\.Y\.Z <sha>/,
-    /CHANGELOG\.md was updated and merged before the gate/, /Refuse to tag if/, /word for word in the release notes/,
-    /if main has moved past that commit/, /if the ITEM commit is not the PR head/,
-  ]) assert.match(sec, re);
-  assert.doesNotMatch(sec, /update CHANGELOG\.md/);
-});
-
-const read = (p) => readFileSync(here(p), 'utf8');
-
-test('Tiny has no planner and no founder-proxy call', () => {
+test('every project remembers, and the founder is spoken to in plain words', () => {
   const md = read('claude/CLAUDE.md');
-  const tiny = (md.match(/^\| Tiny \|.*$/m) || [''])[0];
-  assert.match(md, /^\| Tiny \| the lead, 5 lines or less/m);
-  assert.match(md, /Tiny tasks: founder-proxy is not called/);
-  assert.match(md, /Tiny: must-escalate checked, no hit; reviewer PASS; tool gate exit 0/);
-  assert.doesNotMatch(md, /\| Tiny \| `ecc:planner`/);
-  assert.doesNotMatch(md, /plans Tiny tasks/);
-  assert.match(tiny, /`ecc:code-reviewer` on opus/);
-  const sec = read('claude/agents/github-secretary.md');
-  for (const re of [/Tiny \(no founder-proxy answer\)/, /otherwise refuse and report/, /SPEC\.md/, /never `\.svg`/]) assert.match(sec, re);
-  assert.match(sec, /nor a Tiny line that passes the check below/);
-  const tinyLine = (sec.match(/^.*Tiny \(no founder-proxy answer\).*$/m) || [''])[0];
-  assert.ok(tinyLine, 'no Tiny paragraph in github-secretary.md');
-  for (const re of [
-    /gh api repos\/\{owner\}\/\{repo\}\/pulls\/<n>\/files/, /gh pr checks <n>/, /every status is `added` or `modified`/, /never removed, renamed or copied/, /ignoring case/,
-    /`\.md`/, /`\.txt`/, /`\.png`/, /`\.jpg`/, /`\.gif`/, /`\.webp`/, /never `\.svg`/,
-    /CLAUDE\.md/, /CLAUDE\.local\.md/, /AGENTS\.md/, /GEMINI\.md/, /SKILL\.md/, /SPEC\.md/,
-    /`plugins\.txt`/, /`skills\.txt`/, /`refs\.txt`/, /any file a script, hook or installer reads/,
-    /pulls\/<n>\/files --paginate/, /merge only if every check passes/, /Post the lead's line and the reviewer verdict word for word as the PR comment/,
-  ]) assert.match(tinyLine, re);
-  for (const s of ['rules/', 'agents/', 'skills/', 'templates/', 'git-hooks/', '.claude/', '.claude-plugin/', '.github/', '.husky/', 'claude/']) assert.ok(tinyLine.includes('`' + s + '`'), s);
-  assert.match(md, /A hit goes to the founder; a tier-up or a doubt goes back to the full gates/);
-  assert.match(md, /the head commit, the reviewer verdict and the line/);
-  assert.match(md, /git diff --name-status --no-renames main/);
-  assert.doesNotMatch(md, /--name-only main/);
+  all(section(md, 'Every project remembers'), [/docs\/SPEC\.md/, /docs\/STATUS\.md/, /Read both at the start/, /new-project skill/]);
+  all(section(md, 'Style'), [/Plain words to the founder/, /no jargon/, /answer first, then the reason, then the next step/, /Never drop not, never, no,\s+only or a number/]);
+  all(section(md, 'Who you work for'), [/a topic and a few rough\s+points/, /only have to look and say yes/, /The main session is the lead/]);
 });
 
-test('Normal and Risky keep every security and test check', () => {
-  const md = read('claude/CLAUDE.md');
-  const normal = (md.match(/^\| Normal \|.*$/m) || [''])[0];
-  const risky = (md.match(/^\| Risky \|.*$/m) || [''])[0];
-  assert.match(normal, /security-reviewer on sonnet; tester on sonnet/);
-  assert.match(risky, /the Normal crew, every check on opus/);
-  assert.match(normal, /a finding from security-reviewer or tester: that checker/);
-  assert.match(normal, /no worker run/);
-  assert.match(normal, /a fix diff that touches a risky path also goes to security-reviewer/);
-  assert.match(risky, /security-researcher if the task adds a dependency, login, upload or payment/);
-  assert.match(risky, /the same checker, on opus/);
-  assert.match(md, /A slice of a plan that passed Gate 1 is not planned or gated again while the plan's hash is unchanged/);
-  assert.match(md, /Run security-researcher again/);
-});
-
-test('skills are proposed, seen, checked and proven', () => {
-  const md = read('claude/CLAUDE.md');
-  const skills = (md.match(/^## Skills are used[\s\S]*?(?=^## )/m) || [''])[0];
-  assert.ok(skills, 'no Skills section');
-  for (const re of [/Project list:/, /project CLAUDE\.md under "Skills"/, /`Skills:` line per worker/, /names a design skill from the skill map/, /may CHANGE it/, /one resume of that same worker/, /never a new run or a fix round/]) assert.match(skills, re);
-  for (const re of [/at most 2 per worker, or `none: <why>`/, /A Normal or Risky workflow that used none is not done/, /ends with `skills: <names>`/, /counts only under `~\/\.claude\/plugins\/cache\/` or `~\/\.claude\/skills\/`/, /never overrides the handbook, the security rules or an agent file/]) assert.match(skills, re);
-  assert.doesNotMatch(skills, /does not cause a re-run/);
-  assert.match(md, /report `Skills read: /);
-  const fp = read('claude/agents/founder-proxy.md');
-  for (const re of [/`Skills:` line per worker/, /names a design skill/, /unfit skill is CHANGES/, /slices sized by the work/,
-    /diff files are within the slice's file list in the plan/, /every skill the plan assigned has its "Skills read:" line or a "skipped by" line/, /\(Tiny tasks do not come to you\)/,
-    /Glob or Read it/, /is under ~\/\.claude\/plugins\/cache\/ or ~\/\.claude\/skills\/; any other path is CHANGES/, /any other path is CHANGES/, /`whole file` when the file has no headings/]) assert.match(fp, re);
-  const pl = read('claude/agents/planner.md');
-  assert.match(pl, /slices sized by the work/);
-  assert.match(pl, /`Skills:` line/);
-  const bts = read('claude/skills/brief-to-spec/SKILL.md');
-  assert.match(bts, /^10\. Slices/m);
-  assert.match(bts, /under `## Skills`/);
-  assert.match(bts, /never drop section 7/);
-  assert.match(read('claude/skills/new-project/SKILL.md'), /## Skills/);
-  assert.match(read('claude/templates/project-CLAUDE.md'), /^## Skills/m);
-  assert.match(read('claude/templates/project-CLAUDE.md'), /Changing this list is a founder decision/);
-  assert.match(read('README.md'), /Tiny tasks \(text and docs only\) skip founder-proxy/);
-  assert.match(pl, /Report: number of slices/);
-});
-
-test('caveman and ponytail reach every worker through the handbook', () => {
-  const md = read('claude/CLAUDE.md');
-  const style = (md.match(/^## Style[\s\S]*?(?=^## )/m) || [''])[0];
-  assert.match(md, /^## Style$/m);
-  for (const re of [/never drop not, never, no, only/, /smallest change that fully does the task/, /Never cut validation, permission checks, error handling or tests/, /`Skipped: /]) assert.match(style, re);
-  assert.match(md, /Style, Hard rules and the security, scale and testing rules do/);
+test('tokens are spent on the product, not on process', () => {
+  all(section(read('claude/CLAUDE.md'), 'Cost'), [
+    /Read only the files the task needs, never the whole repo/, /goes to a haiku worker/, /in one message/,
+    /A sub-agent starts cold/, /re-reads its whole history on every turn/, /Task done - start a new session\s+for the next task/,
+    /Routine work runs on opus or sonnet/, /say so once in\s+one line and carry on/,
+  ]);
+  // Only these rule files may load into every session.
+  assert.deepEqual(readdirSync(here('claude/rules')).sort(), ['security.md', 'skill-map.md', 'testing.md']);
 });
 
 test('handbook stays within its line budget', () => {
   const md = read('claude/CLAUDE.md');
-  assert.ok(md.trimEnd().split(/\r?\n/).length <= 205, 'handbook over 205 lines');
-  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 19600, 'handbook over 19600 bytes');
+  assert.ok(md.trimEnd().split(/\r?\n/).length <= 135, 'handbook over 135 lines');
+  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 7000, 'handbook over 7000 bytes');
 });

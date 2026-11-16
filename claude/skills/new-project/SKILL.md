@@ -1,6 +1,6 @@
 ---
 name: new-project
-description: Starts a new project for the founder - folder, git, private GitHub repo, templates, CI, branch protection - then runs brief-to-spec. Use when the founder says "new project", "start a project", or to adopt an existing folder into the company.
+description: Starts a new project for the founder - folder, git, private GitHub repo, templates, CI, branch protection - then runs brief-to-spec (study, spec, one short plan). Use when the founder says "new project", "start a project", or to adopt an existing folder into the company.
 ---
 # New project
 
@@ -24,4 +24,4 @@ description: Starts a new project for the founder - folder, git, private GitHub 
     "enforce_admins":false,
     "required_pull_request_reviews":{"required_approving_review_count":0},
     "restrictions":null}
-6. Run the brief-to-spec skill (adopted project with code: the lead runs `ecc:spec-miner` first). It ends with the founder's approval of the whole project: docs/SPEC.md with its slices, and the skills list in CLAUDE.md under `## Skills`.
+6. Run the brief-to-spec skill (adopted project with code: read the code and run it first). It ends with the founder's yes to one short plan for the whole project: docs/SPEC.md with its slices, and the skills list in CLAUDE.md under `## Skills`.
