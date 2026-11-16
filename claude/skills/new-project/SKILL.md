@@ -24,4 +24,4 @@ description: Starts a new project for the founder - folder, git, private GitHub 
     "enforce_admins":false,
     "required_pull_request_reviews":{"required_approving_review_count":0},
     "restrictions":null}
-6. Run the brief-to-spec skill.
+6. Run the brief-to-spec skill (adopted project with code: the lead runs `ecc:spec-miner` first). It ends with the founder's approval of the whole project: docs/SPEC.md with its slices, and the skills list in CLAUDE.md under `## Skills`.

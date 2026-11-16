@@ -18,6 +18,11 @@
 - Repo is private, no licence.
 - Founder-proxy approved by the founder on 2026-11-16 (plan in `docs/PLAN.md`): a Fable agent decides plan approval, merge and patch or minor releases; the founder is informed about each decision and asked only about the must-escalate list. The founder approved in advance the merge of this change's PR and its 1.2.0 release, on condition that every check is green and no medium-or-higher finding is open.
 - Lean workflow approved on 2026-11-15 (plan in `docs/PLAN.md`), built in PR #15: tier by diff (Tiny, Normal, Risky), tool gate before any reviewer, one security review, scoped re-checks, sonnet for security and tester on Normal tasks. The opus security review widened the Risky list beyond the plan (agent instruction files, headers, CORS, cookies, crypto, raw SQL or HTML, webhooks, logging, outbound requests, Docker or deploy config).
+- Right-sized workflow plan approved by the founder on 2026-11-16 (plan in `docs/PLAN.md`) with both recommended options: Tiny merges pass without founder-proxy on the lead's check, one reviewer and github-secretary's file check; Gate 1 runs once per plan and the lead re-checks exact non-security fixes on Normal. The founder raised the handbook byte cap from 18600 to 19300 on 2026-11-16 because the approved wording measured 19263.
+- Finding: caveman 4.1.0 and ponytail 5.3.3 ship SubagentStart hooks, so workers may already get both rule sets; the handbook Style section is the fallback when a hook is silent.
+- Handbook size (`claude/CLAUDE.md`): before 220 lines / 17285 LF bytes; after 198 lines / 19517 LF bytes (first build 19263).
+- Fix round 1 (2026-11-16): security review found 1 high (a rename or delete hid the old path from the Tiny file check) and 2 medium (file names compared case-sensitively; skill files accepted from any folder); tester found 2 high and 4 medium unpinned rules; code review PASS. All fixed; the byte cap went from 19300 to 19600 for the security wording, and the founder confirmed 19600 the same day. Fix round 2: the tester's re-check found 2 medium unpinned rules (`--paginate` in the Tiny file check, the trusted skill folders in founder-proxy); 4 pins added, no wording changed.
+- Founder-proxy behaviour check (2026-11-16): one fable call (106k tokens) on a plan that changes a screen and names no design skill: CHANGES, naming the impeccable design skill. Side findings, fixed in founder-proxy.md: Glob does not see ~/.claude/skills (Read does); security-checklist has no headings to point at.
 
 ## Benchmark (2026-11-16, old = v1.0.0 handbook `09e8b70`, new = PR #15 `3b5ecc5`)
 Each run with `claude -p` on opus in a throwaway folder; cost from the run's result event. Orders 1 and 3 start after the build, with a seeded draft; order 2 is the full todo CLI order.
@@ -40,6 +45,7 @@ Each run with `claude -p` on opus in a throwaway folder; cost from the run's res
 - All projects that day: fable $109 (5 sessions), opus $32 (11), sonnet $1 (4), haiku $0.02 (3).
 - Task "founder-proxy" (2026-11-16, Risky): 18 sub-agent runs before the PR (8 of them resumed agents), about 545k sub-agent tokens, 2 fix rounds; about 200k of that is the 6 behaviour-check calls. Lead on Fable; cost not yet read from `npx ccusage`.
 - Task "tier-rule fix" (2026-11-16, Risky): 8 sub-agent runs (2 of them resumed agents), about 185k sub-agent tokens, 1 fix round. The second release check before it: 2 runs, about 90k tokens. Lead on Fable; cost not yet read from `npx ccusage`.
+- Task "right-sized workflow" (2026-11-16, Risky): 13 sub-agent runs before the PR (6 of them resumed agents), about 578k sub-agent tokens (planner 104k, architect 66k, builder 107k, code review 66k, security review 67k, tester 62k, founder-proxy trial 106k), 2 fix rounds, and the builder stopped once on the byte cap; lead on Fable, cost not yet read from `npx ccusage`.
 
 ## Founder-proxy behaviour check (2026-11-16, before the merge)
 Fixtures in a throwaway repo; each run is one fable call of 23k to 29k tokens.
@@ -54,7 +60,8 @@ One dated line per founder-proxy decision: date, gate, item, answer, why, PR lin
 - None yet.
 
 ## Open issues
-- Workers skip their assigned skills: three of eight checker runs in PR #11 opened none.
+- Watch item: workers skipped their assigned skills (three of eight checker runs in PR #11 opened none). Count `Skills read:` lines and resumes in the first 3 tasks. This task: 2 of 4 checkers (tester, code reviewer) did not open their skill file, the security reviewer opened 1 of 2, the builder opened its 2 only after a resume.
+- Low, not fixed (2026-11-16): the Tiny file check does not refuse symlinks (mode 120000); docs/STATUS.md and README install commands still merge as Tiny with no founder-proxy; handbook opus row does not say the lead plans Tiny tasks; the Lead section has no Tiny exception next to 'At a founder gate call founder-proxy'; a `Skills read:` line and the lead's Tiny line are trusted as written.
 - The installers do not merge `claude/settings-additions.json` automatically.
 - `check.mjs` does not verify the rules, skills and templates links.
 - CI actions are pinned by tag, not commit SHA.
@@ -66,8 +73,9 @@ One dated line per founder-proxy decision: date, gate, item, answer, why, PR lin
 - Tier rule, after the fix: `docs/STATUS.md`, `docs/PLAN.md` and the README install commands still count as Tiny. The tier test checks words, not behaviour, and does not guard the end of the Risky paragraph.
 - Two sessions ran the v1.1.0 release at the same time; the second review's hold request arrived after the tag.
 - Founder-proxy, known limits: its Bash command list is an instruction, not a tool limit; on Risky tasks a fable plan is approved by a fable proxy (the opus architect check is the counterweight); it may ORDER a patch or minor release nobody asked for; the lead relays its answer to github-secretary, so the PR comment is only as honest as the lead; it is strict and may escalate more than the founder wants (watch the first 3 tasks, then trim the list if needed).
-- Founder-proxy, low findings not fixed: README diagram 2 does not say that Tiny tasks skip the plan gate; three wording pins are loose (`git hash-object` matches three times in the agent file).
+- Founder-proxy, low findings not fixed: three wording pins are loose (`git hash-object` matches three times in the agent file).
 - Git for Windows on this laptop is 2.56.0; the security-researcher reported a fix in 2.56.1 (source not verified).
 
 ## Next step
+Right-sized workflow is built on branch `feat/right-sized-workflow` (22/22 tests); next: tool gate, Risky checks, the fable behaviour check of plan section C.7, then the founder's merge. Earlier notes:
 The fix for the 2 medium tier-rule gaps is merged in PR #17 (plan approved and merge "ok" by the founder on 2026-11-16, Risky tier). Released as v1.1.1 on the founder's "release". Founder-proxy is released as v1.2.0. Run `bash update.sh` on each laptop and restart Claude Code; from then on the lead calls founder-proxy at the plan, merge and release gates and the founder gets one "Fable decided" line per decision. Watch the first 3 tasks: decisions, escalations and the fable cost per gate call. Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.

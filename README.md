@@ -17,8 +17,8 @@ flowchart TD
     subgraph M["Model per job"]
         direction LR
         M1["fable: plans Risky tasks"]
-        M2["opus: leads, plans Normal tasks, checks and reviews"]
-        M3["sonnet: builds, plans Tiny tasks, some Normal checks"]
+        M2["opus: leads, plans Tiny and Normal tasks, checks and reviews"]
+        M3["sonnet: builds, some Normal checks"]
         M4["haiku: bulk reading"]
     end
     L -. "picks one per job" .-> M
@@ -29,9 +29,9 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["Order"] --> T["Tier from the order,<br>re-checked on plan and diff"]
-    T --> B["Pick skills"]
-    B --> C["Plan: sonnet, opus, or fable plus opus check"]
-    C --> D["Gate 1: founder-proxy decides the plan"]
+    T --> B["Propose skills"]
+    B --> C["Plan with a Skills line: the lead on Tiny,<br>opus, or fable plus opus check"]
+    C --> D["Gate 1: founder-proxy decides the plan<br>and its skills (not on Tiny)"]
     D --> E["Build: sonnet,<br>test-first for code"]
     E --> G0{"tool gate green?<br>tests, lint, gitleaks, semgrep"}
     G0 -- no --> E
@@ -42,11 +42,11 @@ flowchart TD
     E2 --> H
     I -- "after 3 rounds" --> Z["Stop and ask the founder"]
     H -- yes --> J["PR and CI: github-secretary"]
-    J --> K["Merge gate: founder-proxy decides"]
-    K --> L["Merge, update STATUS and PLAN"]
+    J --> K["Merge gate: founder-proxy decides<br>(Tiny: the lead's must-escalate check)"]
+    K --> L["Merge, update STATUS"]
 ```
 
-For each task founder-proxy (a Fable agent) decides the routine gates: the plan and the merge, and patch and minor releases. The founder is told about each decision and is asked only about the must-escalate list (outward or irreversible actions, money, secrets, specs, first production deploys, major versions, changes to instruction files and scripts, known security findings, skipping or weakening a test, check or gate, 3 failed fix rounds, a requirement the spec does not answer, or Fable is not sure).
+For each Normal or Risky task founder-proxy (a Fable agent) decides the routine gates: the plan and the merge, and patch and minor releases. The founder is told about each decision and is asked only about the must-escalate list (outward or irreversible actions, money, secrets, specs, first production deploys, major versions, changes to instruction files and scripts, known security findings, skipping or weakening a test, check or gate, 3 failed fix rounds, a requirement the spec does not answer, or Fable is not sure). Tiny tasks (text and docs only) skip founder-proxy: the lead's must-escalate check, one reviewer and the tool gate decide.
 
 ## What is in here
 
