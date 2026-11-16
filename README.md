@@ -41,9 +41,9 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 | Path | What |
 |---|---|
 | `claude/CLAUDE.md` | The handbook every session reads first |
-| `claude/rules/` | Rules: security, testing and the skill map are always on; scale applies only when a product needs it |
+| `claude/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
 | `claude/agents/` | 12 staff agents |
-| `claude/skills/` | 5 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist |
+| `claude/skills/` | 6 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale) |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
 | `plugins.txt` | Every plugin, and whether it is on or off |

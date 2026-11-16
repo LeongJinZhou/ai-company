@@ -157,8 +157,11 @@ test('security is always on, scale only when the product needs it', () => {
   const md = read('claude/CLAUDE.md');
   for (const rule of ['security', 'testing', 'skill-map']) assert.match(md, new RegExp(`^@~/\\.claude/rules/${rule}\\.md$`, 'm'));
   assert.doesNotMatch(md, /^@.*scale\.md/m);
-  all(section(md, 'Scale'), [/apply it only when docs\/SPEC\.md says/, /does not get multi-tenant tables/]);
-  assert.match(read('claude/rules/scale.md'), /Apply these only when docs\/SPEC\.md says/);
+  all(section(md, 'Scale'), [/scale-standards skill only when docs\/SPEC\.md says/, /does not get\s+multi-tenant tables/]);
+  // Every file in claude/rules/ loads into every session, so the scale rules live in a skill, read on demand.
+  assert.ok(!existsSync(here('claude/rules/scale.md')), 'scale.md is back in the always-loaded rules folder');
+  all(read('claude/skills/scale-standards/SKILL.md'), [/^description: .*Use only when docs\/SPEC\.md says/m, /never for a prototype/, /organisation_id/, /paginated on the server/]);
+  assert.doesNotMatch(read('claude/skills/backend-standards/SKILL.md'), /organisation_id|large organisations/);
   all(read('claude/rules/security.md'), [/from the first line of a prototype/, /Never\s+skip a rule that does apply/, /parameterised queries/, /No secrets in frontend code/]);
   all(section(md, '3\\. Build'), [/Server\s+code: backend-standards and security-checklist/, /apply from the first\s+line of a prototype/, /Secrets, tokens, keys and anything worth stealing\s+live on the server/]);
   all(section(md, '4\\. Check yourself'), [/against the security-checklist skill/, /Login,\s+payment, upload, personal data or a new dependency also goes to\s+security-reviewer/, /security-researcher/]);
@@ -233,8 +236,18 @@ test('every project remembers, and the founder is spoken to in plain words', () 
   all(section(md, 'Who you work for'), [/a topic and a few rough\s+points/, /only have to look and say yes/, /The main session is the lead/]);
 });
 
+test('tokens are spent on the product, not on process', () => {
+  all(section(read('claude/CLAUDE.md'), 'Cost'), [
+    /Read only the files the task needs, never the whole repo/, /goes to a haiku worker/, /in one message/,
+    /A sub-agent starts cold/, /re-reads its whole history on every turn/, /Task done - start a new session\s+for the next task/,
+    /Routine work runs on opus or sonnet/, /say so once in\s+one line and carry on/,
+  ]);
+  // Only these rule files may load into every session.
+  assert.deepEqual(readdirSync(here('claude/rules')).sort(), ['security.md', 'skill-map.md', 'testing.md']);
+});
+
 test('handbook stays within its line budget', () => {
   const md = read('claude/CLAUDE.md');
-  assert.ok(md.trimEnd().split(/\r?\n/).length <= 125, 'handbook over 125 lines');
-  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 6500, 'handbook over 6500 bytes');
+  assert.ok(md.trimEnd().split(/\r?\n/).length <= 135, 'handbook over 135 lines');
+  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 7000, 'handbook over 7000 bytes');
 });

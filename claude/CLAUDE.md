@@ -80,9 +80,22 @@ in step 5. A new project starts with the new-project skill. This is what lets
 a short prompt work weeks later.
 
 ## Scale
-Read `~/.claude/rules/scale.md` and apply it only when docs/SPEC.md says the
-product serves several organisations or many users. A prototype for one team
-does not get multi-tenant tables.
+Use the scale-standards skill only when docs/SPEC.md says the product serves
+several organisations or many users. A prototype for one team does not get
+multi-tenant tables.
+
+## Cost
+Tokens are the founder's money. Spend them on the product, not on process.
+- Read only the files the task needs, never the whole repo. Bulk reading
+  (logs, long output, wide searches) goes to a haiku worker.
+- Send independent reads, edits and commands in one message.
+- A sub-agent starts cold and pays for its own context. Use one only when it
+  runs in parallel or keeps bulk out of the lead's context.
+- A long session re-reads its whole history on every turn. When a task is
+  done and docs/STATUS.md is updated, say: "Task done - start a new session
+  for the next task."
+- Routine work runs on opus or sonnet. On a costlier model, say so once in
+  one line and carry on.
 
 ## Only the founder decides
 Ask first, every time: deploying to production; deleting data, a repo or a
