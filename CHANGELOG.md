@@ -4,6 +4,9 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+### Fixed
+- Tier rule: the install lists (`plugins.txt`, `skills.txt`, `refs.txt`), everything under `rules/` and `templates/`, and `*.cmd` and `*.ps1` scripts are Risky; a file on the risky list is never Tiny because of its extension
+
 ## [1.1.0] - 2026-11-16
 
 ### Added

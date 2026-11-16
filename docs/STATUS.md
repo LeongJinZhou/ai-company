@@ -3,7 +3,7 @@
 ## Done
 - Kit installed and verified by `node check.mjs`.
 - PRs #1-#11 merged. v1.0.0 released.
-- v1.1.0 released on 2026-11-16 (lean workflow, CI actions v7). Release checks: 15/15 tests, gitleaks and semgrep clean, security review no findings, security-researcher no blocking advisories.
+- v1.1.0 released on 2026-11-16 (lean workflow, CI actions v7). Release checks: 15/15 tests, gitleaks clean, security-researcher no blocking advisories. A second security review (opus, on `git diff v1.0.0..main`) finished after the tag and found 2 medium gaps in the tier rule: the install lists (`plugins.txt`, `skills.txt`, `refs.txt`), `rules/`, `templates/`, `*.cmd` and `*.ps1` could count as Tiny and skip the security review. Semgrep did not run in that second check (rules could not be downloaded).
 - Tiered model routing is live.
 - Lean workflow merged in PR #15 (founder ok on 2026-11-16). Each laptop needs `bash update.sh` to install the new handbook.
 - GitHub settings applied: description, topics, squash-only merges, merged branches auto-delete, wiki off, main protected (CI check `test` required).
@@ -35,6 +35,7 @@ Each run with `claude -p` on opus in a throwaway folder; cost from the run's res
 ## Cost baseline (2026-11-15, ECC cost tracker estimates)
 - Task "repo polish" (docs only, PR #11): 12 sub-agent runs, about 533k sub-agent tokens; checks and re-checks were 69% of them. Lead session on Fable: about $11.
 - All projects that day: fable $109 (5 sessions), opus $32 (11), sonnet $1 (4), haiku $0.02 (3).
+- Task "tier-rule fix" (2026-11-16, Risky): 8 sub-agent runs (2 of them resumed agents), about 185k sub-agent tokens, 1 fix round. The second release check before it: 2 runs, about 90k tokens. Lead on Fable; cost not yet read from `npx ccusage`.
 
 ## Open issues
 - Workers skip their assigned skills: three of eight checker runs in PR #11 opened none.
@@ -44,6 +45,11 @@ Each run with `claude -p` on opus in a throwaway folder; cost from the run's res
 - CI uses `node-version: 22`, which floats to the latest 22.x. Laptops need Node 22.23.5 or later (security release of 2026-11-11).
 - Plugins in `plugins.txt` are unpinned, and nobody has checked them one by one for advisories.
 - The desktop app's model picker overrides `"model": "opus"` in `settings.json`; set the model in the app for each new session.
+- Low findings from the second release review (2026-11-16), not fixed: `office-proxy.mjs` accepts any `*.ts.net` host, not only this machine; the pre-commit hook passes silently when gitleaks is missing; `claude/templates/ci.yml` has no `permissions:` block; the installers leave ccusage and semgrep unpinned; the tool gate does not say "semgrep not run".
+- Semgrep cannot download its rules on this laptop, so it has not run in any gate here.
+- Tier rule, after the fix: `docs/STATUS.md`, `docs/PLAN.md` and the README install commands still count as Tiny. The tier test checks words, not behaviour, and does not guard the end of the Risky paragraph.
+- Two sessions ran the v1.1.0 release at the same time; the second review's hold request arrived after the tag.
+- Git for Windows on this laptop is 2.56.0; the security-researcher reported a fix in 2.56.1 (source not verified).
 
 ## Next step
-Wait for the founder's next order. Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
+The fix for the 2 medium tier-rule gaps is built and checked on branch `fix/tier-rule-gaps` (plan approved by the founder on 2026-11-16, Risky tier). Founder "ok" merges the PR; then `bash update.sh` on each laptop; then v1.1.1 on the founder's "release". Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
