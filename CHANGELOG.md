@@ -4,6 +4,8 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-16
+
 ### Changed
 - Right-sized workflow: Tiny tasks are planned by the lead in 5 lines with no planner and no founder-proxy call (one reviewer, the tool gate and the must-escalate check stay); plans cut the work into slices and Gate 1 runs once per plan; skills are proposed per project and per plan, checked by founder-proxy and proven by each worker; the caveman and ponytail rules are spelled out in the handbook Style section
 
