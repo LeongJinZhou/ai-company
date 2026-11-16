@@ -4,6 +4,7 @@
 - Kit installed and verified by `node check.mjs`.
 - PRs #1-#11 merged. v1.0.0 released.
 - v1.1.0 released on 2026-11-16 (lean workflow, CI actions v7). Release checks: 15/15 tests, gitleaks clean, security-researcher no blocking advisories. A second security review (opus, on `git diff v1.0.0..main`) finished after the tag and found 2 medium gaps in the tier rule: the install lists (`plugins.txt`, `skills.txt`, `refs.txt`), `rules/`, `templates/`, `*.cmd` and `*.ps1` could count as Tiny and skip the security review. Semgrep did not run in that second check (rules could not be downloaded).
+- Tier-rule fix merged in PR #17: the install lists (`plugins.txt`, `skills.txt`, `refs.txt`), `rules/`, `templates/`, `*.cmd` and `*.ps1` are Risky. Not yet released; each laptop needs `bash update.sh`.
 - Tiered model routing is live.
 - Lean workflow merged in PR #15 (founder ok on 2026-11-16). Each laptop needs `bash update.sh` to install the new handbook.
 - GitHub settings applied: description, topics, squash-only merges, merged branches auto-delete, wiki off, main protected (CI check `test` required).
@@ -52,4 +53,4 @@ Each run with `claude -p` on opus in a throwaway folder; cost from the run's res
 - Git for Windows on this laptop is 2.56.0; the security-researcher reported a fix in 2.56.1 (source not verified).
 
 ## Next step
-The fix for the 2 medium tier-rule gaps is built and checked on branch `fix/tier-rule-gaps` (plan approved by the founder on 2026-11-16, Risky tier). Founder "ok" merges the PR; then `bash update.sh` on each laptop; then v1.1.1 on the founder's "release". Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
+The fix for the 2 medium tier-rule gaps is merged in PR #17 (plan approved and merge "ok" by the founder on 2026-11-16, Risky tier). Run `bash update.sh` on each laptop to install the new handbook; then release as v1.1.1 on the founder's "release". Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
