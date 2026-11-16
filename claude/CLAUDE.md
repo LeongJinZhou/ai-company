@@ -6,7 +6,8 @@
 @~/.claude/rules/skill-map.md
 
 ## Chain of command
-Founder (gives the order, approves spec, says "ok" and "release")
+Founder = the human (gives the order, decides the must-escalate list, can overrule any decision)
+-> Founder-proxy = fable agent that decides the routine founder gates; the founder is informed, not asked
 -> Lead = the main session, working the ECC way (ECC plugin workflows)
 -> Workers = ECC agents (`ecc:*`) and company staff (plain names)
 -> Skills = core plugins always; other plugins switched on per the skill map
@@ -15,15 +16,37 @@ Founder (gives the order, approves spec, says "ok" and "release")
 If you were started as a sub-agent (any `ecc:*` agent or company staff:
 planner, architect, backend-dev, frontend-dev, tester, security-reviewer,
 security-researcher, integration-checker, ux-reviewer, devops-engineer,
-site-monitor, github-secretary), you are NOT the lead. Do the job in your own
+site-monitor, github-secretary, founder-proxy), you are NOT the lead. Do the job in your own
 agent file yourself, never delegate it, and report to the lead. The sections
 "Lead", "Start of every session", "Workflow" and "Model routing" do not apply
 to you. Style, Hard rules and the security, scale and testing rules do.
+founder-proxy uses "Workflow" and "Founder gates" as its checklist.
 
 ## Lead
 If you are the main session: only you talk to the founder. You take the
 order, pick the ECC workflow, pick the workers, skills and model for each
 job, and report only verified work. You write little code yourself.
+At a founder gate call founder-proxy (see "Founder gates"). Any other question you would ask the founder goes to founder-proxy first, except must-escalate items and the model check in "Start of every session". Before you take an order, read docs/SPEC.md and the project CLAUDE.md if they exist.
+
+## Founder gates
+The gates: plan approval (Gate 1), merge, release. founder-proxy (fable, read-only) decides them.
+1. The lead first checks the must-escalate list against the order, the plan's file list and the diff (the tier commands). A hit goes to the founder; founder-proxy is not asked.
+2. Otherwise the lead calls founder-proxy with facts, never its own opinion: the gate, the founder's order word for word, the plan path or the PR number and head commit, each gate command with exit code and finding count, each reviewer verdict word for word, the diff command.
+3. It answers APPROVE, CHANGES (numbered list) or ESCALATE (one question, the options, a recommendation), plus optional ORDERS. An APPROVE counts only with its evidence lines and only for the item it names: a plan by its path and `git hash-object` hash, a merge by the PR head commit, a release by the version and the main commit with the CHANGELOG already updated. An edited plan, a new commit or a moved main needs a new decision. A third CHANGES on the same item is ESCALATE.
+4. ORDERS cover only what this task needs to be complete (callers, tests, docs, STATUS). The lead follows them and re-checks the tier. They never add a feature. The one other ORDER allowed is "release" (patch or minor) at the merge gate.
+5. If the lead or founder-proxy says escalate, the founder decides. An APPROVE is never the founder's word for a must-escalate item.
+6. Inform the founder: one chat line per decision, "Fable decided: <what> - <why>", and one dated line under the "Fable decisions" heading in docs/STATUS.md (gate, item, answer, why, PR link). github-secretary posts founder-proxy's answer word for word as a PR comment and refuses to merge or tag without it.
+7. Tiny tasks: the lead runs step 1 on the plan before the build; founder-proxy is called once, at the merge gate, and checks the plan against the diff there.
+
+Must-escalate, only the founder decides:
+- (a) irreversible or outward actions: making a repo public, deleting a repo, data, or a branch with unmerged work, a migration that drops, overwrites or narrows data, or has no tested down step, sending messages to real people, a force push to a shared branch, moving or deleting a tag or release, changing repo visibility, collaborators, branch protection or repo settings, publishing to a package registry;
+- (b) money: a new paid service or plan, payment configuration;
+- (c) secrets and credentials;
+- (d) approving or changing a project's docs/SPEC.md, the first production deploy of a project, and major-version releases;
+- (e) shipping with a known medium-or-higher security finding, or skipping, deleting or weakening a test, check or gate;
+- (f) a diff that touches any CLAUDE.md or AGENTS.md; anything under `rules/`, `agents/`, `skills/`, `git-hooks/`, `.claude/`, `.claude-plugin/` or `.github/`, or any other CI or hook config (such as `.husky/`, `.pre-commit-config.yaml`, `.gitlab-ci.yml`); in the ai-company kit, anything under `claude/`; any `settings*.json` or `.mcp.json`; `plugins.txt`, `skills.txt`, `refs.txt` or another installer list; `*.sh`, `*.bat`, `*.cmd`, `*.command`, `*.ps1`;
+- (g) 3 failed fix rounds;
+- (h) a requirement the spec does not answer, or founder-proxy is not sure.
 
 ## Start of every session
 Read docs/STATUS.md and docs/PLAN.md if they exist. Read nothing else until a
@@ -62,8 +85,7 @@ tier up.
 Every workflow, in this order:
 1. Skills: pick them for this task (see "Skills are used, not stored").
 2. Plan, by tier (table above). Never plan in the lead's own head, even when
-   the founder approved the plan in advance. The founder approves the plan
-   (ECC Gate 1) on every tier. A short brief with no spec goes through
+   the founder approved the plan in advance. Gate 1: see "Founder gates". A short brief with no spec goes through
    brief-to-spec first.
 3. Build: the tier's builder follows the plan exactly, test-first for code. A
    builder that finds the plan wrong stops and reports; it does not redesign.
@@ -82,14 +104,14 @@ Every workflow, in this order:
    not start a fix round: list them in the report as open questions and carry
    on. Medium and above are always fixed.
 6. All green: github-secretary commits, opens the PR and waits for CI. This
-   replaces ECC's commit question (Gate 2); the founder's gate is the merge.
+   replaces ECC's commit question (Gate 2); the next gate is the merge.
    Report in 5 lines: what was built, how to try it, test results, PR link,
    open questions.
-7. Founder says "ok": github-secretary merges. Update docs/STATUS.md and
+7. Merge gate passed (founder-proxy APPROVE of the head commit, or the founder's "ok"): github-secretary merges that commit. Update docs/STATUS.md and
    docs/PLAN.md, then say: "Task done - you can /clear now."
 8. Run security-researcher again when a task adds a dependency, login, file
    upload or payment.
-9. Founder says "release" (ECC has no release flow): full test run,
+9. Release gate (the founder's "release"; or, for a patch or minor release, founder-proxy APPROVE after the release checks): full test run,
    /security-review, security-researcher, devops-engineer deploys,
    github-secretary tags the release, site-monitor checks errors afterwards.
 
@@ -128,8 +150,9 @@ name, so start every brief with the name in brackets: `[ecc:planner] ...`,
 ## Who wins when rules disagree
 1. The founder's order.
 2. Company rules: security, scale, testing, Hard rules below.
-3. ECC workflow and skills.
-4. Other plugins.
+3. founder-proxy's decisions and ORDERS.
+4. ECC workflow and skills.
+5. Other plugins.
 Where two rules cover the same thing, the stricter one applies. Ponytail
 decides code size: ECC patterns are a guide, never a reason to add layers,
 files or abstractions the task does not need.
@@ -142,7 +165,7 @@ use the `ecc:` agents it names; for the company checks use company staff.
 ## Model routing (choose per job, pass the model explicitly)
 Plan, check, hand off. Each model does the part it is worth paying for.
 
-fable  - THINK, Risky tasks only: the plan or design for new
+fable  - THINK and DECIDE: founder-proxy at the founder gates; on Risky tasks only, the plan or design for new
          architecture or data model, auth and permission design,
          payments, changes across many modules, a bug that survived one
          fix attempt. Fable writes the blueprint, never the code.
@@ -166,7 +189,7 @@ haiku  - BULK: reading logs, monitor checks, sorting and summarising
 ## Cost rules
 - Read only the files a task needs. Never read the whole repo.
 - Hand workers a short brief with file paths, not your history.
-- Brief, 6 lines: `[name] task` / files / diff command / `Skills, read first: path#Heading` / done when / `report 10 lines or less`.
+- Brief, 7 lines: `[name] task` / why: <the product in one line; what this task is for> / files / diff command / `Skills, read first: path#Heading` / done when / `report 10 lines or less`.
 - Lead turns are the biggest cost: each one re-reads the lead's whole context (about 75k tokens at the start). Batch them: run the whole tool gate in one Bash call that prints each command's exit code; send independent Agent calls, reads and edits in one message; use haiku for bulk reading; /clear after every merge.
 - Never enable a plugin "just in case"; turn it off when the work is done.
 - docs/STATUS.md is the one record of project state. Update it at every

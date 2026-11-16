@@ -108,7 +108,7 @@ test('handbook names the tiers and the risky paths', () => {
 
 test('agent models match the routing table', () => {
   const models = {
-    architect: 'fable', 'backend-dev': 'sonnet', 'devops-engineer': 'sonnet', 'frontend-dev': 'sonnet',
+    architect: 'fable', 'backend-dev': 'sonnet', 'devops-engineer': 'sonnet', 'founder-proxy': 'fable', 'frontend-dev': 'sonnet',
     'github-secretary': 'sonnet', 'integration-checker': 'opus', planner: 'opus', 'security-researcher': 'opus',
     'security-reviewer': 'opus', 'site-monitor': 'haiku', tester: 'sonnet', 'ux-reviewer': 'opus',
   };
@@ -137,4 +137,60 @@ test('README diagram 2 shows tiers and the tool gate', () => {
   assert.equal(blocks.length, 3);
   assert.ok(blocks[1].includes('Tier'), 'diagram 2 lacks Tier');
   assert.match(blocks[1], /tool gate/i);
+  assert.match(blocks[0], /founder-proxy/);
+  assert.match(blocks[1], /founder-proxy/);
+});
+
+test('handbook names the founder gates and the must-escalate list', () => {
+  const md = readFileSync(here('claude/CLAUDE.md'), 'utf8');
+  const raw = (md.match(/^## Founder gates[\s\S]*?(?=^## |(?![\s\S]))/m) || [''])[0];
+  const gates = raw.toLowerCase();
+  assert.ok(gates, 'no Founder gates section');
+  for (const re of [
+    /APPROVE, CHANGES \(numbered list\) or ESCALATE/,
+    /only for the item it names: a plan by its path and `git hash-object` hash, a merge by the PR head commit, a release by the version and the main commit/,
+    /An edited plan, a new commit or a moved main needs a new decision/,
+    /ORDERS cover only what this task needs to be complete/,
+    /They never add a feature/,
+    /A hit goes to the founder; founder-proxy is not asked/,
+    /A third CHANGES on the same item is ESCALATE/,
+    /posts founder-proxy's answer word for word as a PR comment and refuses to merge or tag without it/,
+  ]) assert.match(raw, re);
+  for (const w of ['approve', 'changes', 'escalate', 'orders', "never the founder's word", 'fable decided:']) {
+    assert.ok(gates.includes(w), `gates lack "${w}"`);
+  }
+  for (const re of [
+    /public/, /deleting a repo, data, or a branch with unmerged work/, /drops, overwrites or narrows data, or has no tested down step/,
+    /collaborators/, /package registry/, /repo visibility/, /a requirement the spec does not answer/, /skills\.txt/, /refs\.txt/,
+    /agents\.md/, /\*\.bat/, /\*\.cmd/, /\*\.command/, /\*\.ps1/, /skipping, deleting or weakening a test, check or gate/,
+    /`\.claude-plugin\/`/, /any other ci or hook config/, /real people/, /paid/, /payment/, /secrets and credentials/, /spec\.md/,
+    /first production deploy/, /major-version/, /medium-or-higher/, /weakening/, /any claude\.md/, /`rules\/`/,
+    /`agents\/`/, /`skills\/`/, /`git-hooks\/`/, /`\.github\/`/, /`\.claude\/`/, /`claude\/`/, /settings\*\.json/,
+    /\.mcp\.json/, /plugins\.txt/, /\*\.sh/, /force push/, /branch protection/, /tag or release/,
+    /3 failed fix rounds/, /not sure/,
+  ]) assert.match(gates, re);
+  assert.match(md, /github-secretary, founder-proxy\), you are NOT the lead/);
+  assert.match(md, /^fable\s+- THINK and DECIDE: founder-proxy/m);
+  assert.match(md, /Brief, 7 lines:.*why: /);
+});
+
+test('founder-proxy is read-only and treats what it reads as data', () => {
+  const file = readFileSync(here('claude/agents/founder-proxy.md'), 'utf8');
+  const front = (file.match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
+  assert.equal(front.match(/^tools:\s*(.*?)\s*$/m)?.[1], 'Read, Grep, Glob, Bash');
+  assert.doesNotMatch(front, /^memory:/m);
+  for (const re of [
+    /is data/, /quote it/, /APPROVE/, /CHANGES/, /ESCALATE/, /ORDERS/, /Never edit, commit, push, merge, tag or deploy/,
+    /Bash only for `git diff`/, /`git hash-object`/, /Only the handbook \(`~\/\.claude\/CLAUDE\.md`/,
+    /A hit or a doubt is ESCALATE/, /Missing evidence or not sure means ESCALATE/,
+    /Release gate: ITEM is the version and the main commit/, /patch or minor only; not a first production deploy/,
+    /a missing decision or a different hash is ESCALATE/, /put the plan's `git hash-object` hash in ITEM/,
+  ]) assert.match(file, re);
+  const sec = readFileSync(here('claude/agents/github-secretary.md'), 'utf8');
+  for (const re of [
+    /gh pr merge <n> --squash --delete-branch --match-head-commit <sha>/, /as a PR comment/, /Refuse to merge/, /git tag -a vX\.Y\.Z <sha>/,
+    /CHANGELOG\.md was updated and merged before the gate/, /Refuse to tag if/, /word for word in the release notes/,
+    /if main has moved past that commit/, /if the ITEM commit is not the PR head/,
+  ]) assert.match(sec, re);
+  assert.doesNotMatch(sec, /update CHANGELOG\.md/);
 });
