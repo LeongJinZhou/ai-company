@@ -4,11 +4,14 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-16
+
 ### Added
-- Hard rule: workers change files only with the Write or Edit tools
+- Hard rule: workers change files only with the Write or Edit tools (#15)
 
 ### Changed
-- Lean workflow: tiers by diff (Tiny, Normal, Risky), a tool gate before any reviewer, one security review, re-checks scoped to the fix, sonnet for security-reviewer and tester on Normal tasks, and a lead that warns and waits when it is not on opus
+- Lean workflow: tiers by diff (Tiny, Normal, Risky), a tool gate before any reviewer, one security review, re-checks scoped to the fix, sonnet for security-reviewer and tester on Normal tasks, and a lead that warns and waits when it is not on opus (#15)
+- CI uses actions/checkout and actions/setup-node v7 (#12, #13)
 
 ## [1.0.0] - 2026-11-15
 

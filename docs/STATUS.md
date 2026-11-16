@@ -3,6 +3,7 @@
 ## Done
 - Kit installed and verified by `node check.mjs`.
 - PRs #1-#11 merged. v1.0.0 released.
+- v1.1.0 released on 2026-11-16 (lean workflow, CI actions v7). Release checks: 15/15 tests, gitleaks and semgrep clean, security review no findings, security-researcher no blocking advisories.
 - Tiered model routing is live.
 - Lean workflow merged in PR #15 (founder ok on 2026-11-16). Each laptop needs `bash update.sh` to install the new handbook.
 - GitHub settings applied: description, topics, squash-only merges, merged branches auto-delete, wiki off, main protected (CI check `test` required).
@@ -40,7 +41,9 @@ Each run with `claude -p` on opus in a throwaway folder; cost from the run's res
 - The installers do not merge `claude/settings-additions.json` automatically.
 - `check.mjs` does not verify the rules, skills and templates links.
 - CI actions are pinned by tag, not commit SHA.
+- CI uses `node-version: 22`, which floats to the latest 22.x. Laptops need Node 22.23.5 or later (security release of 2026-11-11).
+- Plugins in `plugins.txt` are unpinned, and nobody has checked them one by one for advisories.
 - The desktop app's model picker overrides `"model": "opus"` in `settings.json`; set the model in the app for each new session.
 
 ## Next step
-Release the lean workflow as v1.1.0 when the founder says "release". Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.
+Wait for the founder's next order. Order 2 still misses its 60% line; the next lever is the lead's 74k starting context (plugins loaded in every session), which the handbook cannot change.

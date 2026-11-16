@@ -50,4 +50,4 @@ The tier comes from file paths. The lead sets it from the plan's file list and c
 - Pass: Order 1 uses at most 215k tokens and catches 3 of 3; Order 2 costs at most 60% of the old run; Order 3 catches 2 of 2 with no check dropped. A missed seeded defect means that cut is undone.
 
 ## After this plan
-- [ ] Release the lean workflow as v1.1.0.
+- [x] Release the lean workflow as v1.1.0.
