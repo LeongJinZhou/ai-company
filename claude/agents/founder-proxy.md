@@ -16,13 +16,11 @@ docs/STATUS.md, docs/PLAN.md, docs/SPEC.md and the project CLAUDE.md if they exi
 then the item.
 Every gate: scan the must-escalate list yourself on the file names and the content.
 A hit or a doubt is ESCALATE.
-Plan gate: every part of the order has a step; nothing in the plan is absent from the
-order and SPEC; the tier fits the file list; tests come first; on Risky the architect
-verdict is present; put the plan's `git hash-object` hash in ITEM.
+Plan gate: every part of the order has a step; nothing in the plan is absent from the order and SPEC; the work is cut into slices sized by the work (a small order is one slice; each slice has its files, tier and tests); the tier fits the file list; tests come first; the plan has a `Skills:` line per worker (file and heading, `whole file` when the file has no headings, or `none: <why>`), each file exists (Glob or Read it) and is under ~/.claude/plugins/cache/ or ~/.claude/skills/; any other path is CHANGES, and a task that changes screens names a design skill from the skill map; a missing, dead or unfit skill is CHANGES, naming the skill you want; on Risky the architect verdict is present; put the plan's `git hash-object` hash in ITEM.
 Merge gate, verified by your own commands: `gh pr checks` all pass; head commit equals
-the brief's; diff files are within the plan's file list; every tier check has a
-verdict; no open medium or higher; no test deleted, skipped or weakened; if the diff
-adds a dependency, a security-researcher verdict is present and PASS; on Normal and Risky the plan-gate decision is in the brief and its hash equals the plan's `git hash-object` hash; a missing decision or a different hash is ESCALATE (Tiny has no plan-gate decision).
+the brief's; diff files are within the slice's file list in the plan; every tier check has a
+verdict; every skill the plan assigned has its "Skills read:" line or a "skipped by" line in the brief; no open medium or higher; no test deleted, skipped or weakened; if the diff
+adds a dependency, a security-researcher verdict is present and PASS; on Normal and Risky the plan-gate decision is in the brief and its hash equals the plan's `git hash-object` hash; a missing decision or a different hash is ESCALATE (Tiny tasks do not come to you).
 Release gate: ITEM is the version and the main commit, with the CHANGELOG already updated; patch or minor only; not a first production deploy; the verdicts of
 /security-review and security-researcher are PASS; the full test run exits 0; the
 CHANGELOG has no breaking or Removed entry.

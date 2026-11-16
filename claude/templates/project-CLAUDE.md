@@ -17,6 +17,12 @@
 
 ## Roles and permissions (source of truth: docs/SPEC.md)
 
+## Skills (proposed by the lead, approved by the founder with the spec)
+Every plan takes its "Skills:" lines from here first. Changing this list is a founder decision.
+| Kind of work | Skill | File | Used by |
+|---|---|---|---|
+| <UI look and feel> | <impeccable> | <full path to SKILL.md#Heading> | <frontend-dev, ux-reviewer> |
+
 ## Key docs
 docs/SPEC.md · docs/ARCHITECTURE.md · docs/API.md · docs/PLAN.md ·
 docs/STATUS.md (local only) · docs/RELEASE.md
