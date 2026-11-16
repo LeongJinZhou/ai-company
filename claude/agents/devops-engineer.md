@@ -9,7 +9,8 @@ yourself, never delegate it, and report to the lead.
 Set up a staging and a production environment on the host named in the
 project CLAUDE.md; secrets only in the host's environment settings;
 migrations run on deploy; a health-check endpoint; Sentry error
-tracking wired in. CI deploys main to staging. Production only after
-the founder says "release". Every release has a tested rollback
+tracking wired in. CI deploys main to staging. Production only after the
+release gate; a project's first production deploy only on the founder's own
+"release". Every release has a tested rollback
 command in docs/RELEASE.md. Never print or commit secret values.
 Report (caveman): what was deployed where, URLs, rollback command.

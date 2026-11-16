@@ -3,14 +3,15 @@
 [![ci](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml/badge.svg)](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml)
 
 My personal AI software company for Claude Code.
-I give the order; the lead session plans and checks the work; staff agents and plugin skills do it.
+I give the order; a Fable founder-proxy decides the routine gates; the lead session plans and checks the work; staff agents and plugin skills do it.
 
 ## How it works
 
 ```mermaid
 flowchart TD
-    F["Founder<br>gives the order, approves the plan,<br>says ok and release"] --> L["Lead: main session on opus<br>takes the order, picks workflow,<br>workers, skills and model"]
-    L --> W["Workers<br>ecc:* agents and 12 staff agents"]
+    F["Founder<br>gives the order, decides the<br>must-escalate list"] --> FP["founder-proxy: fable<br>decides the routine founder gates"]
+    FP --> L["Lead: main session on opus<br>takes the order, picks workflow,<br>workers, skills and model"]
+    L --> W["Workers<br>ecc:* agents and 13 staff agents"]
     W --> S["Skills: used, not stored<br>the lead passes SKILL.md paths in each brief"]
     R["Always on<br>security, scale and testing rules"] -.-> W
     subgraph M["Model per job"]
@@ -30,7 +31,7 @@ flowchart TD
     A["Order"] --> T["Tier from the order,<br>re-checked on plan and diff"]
     T --> B["Pick skills"]
     B --> C["Plan: sonnet, opus, or fable plus opus check"]
-    C --> D["Gate 1: founder approves plan"]
+    C --> D["Gate 1: founder-proxy decides the plan"]
     D --> E["Build: sonnet,<br>test-first for code"]
     E --> G0{"tool gate green?<br>tests, lint, gitleaks, semgrep"}
     G0 -- no --> E
@@ -41,11 +42,11 @@ flowchart TD
     E2 --> H
     I -- "after 3 rounds" --> Z["Stop and ask the founder"]
     H -- yes --> J["PR and CI: github-secretary"]
-    J --> K["Founder says ok"]
+    J --> K["Merge gate: founder-proxy decides"]
     K --> L["Merge, update STATUS and PLAN"]
 ```
 
-For each task the founder has two gates: approving the plan, and saying ok to the merge. New projects add a spec approval first; a release needs the word release.
+For each task founder-proxy (a Fable agent) decides the routine gates: the plan and the merge, and patch and minor releases. The founder is told about each decision and is asked only about the must-escalate list (outward or irreversible actions, money, secrets, specs, first production deploys, major versions, changes to instruction files and scripts, known security findings, skipping or weakening a test, check or gate, 3 failed fix rounds, a requirement the spec does not answer, or Fable is not sure).
 
 ## What is in here
 
@@ -53,7 +54,7 @@ For each task the founder has two gates: approving the plan, and saying ok to th
 |---|---|
 | `claude/CLAUDE.md` | The handbook every session reads first |
 | `claude/rules/` | Always-on rules: security, scale, testing, skill map |
-| `claude/agents/` | 12 staff agents |
+| `claude/agents/` | 13 staff agents |
 | `claude/skills/` | 5 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |

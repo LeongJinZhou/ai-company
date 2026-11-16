@@ -4,6 +4,11 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-16
+
+### Changed
+- Chain of command: a Fable founder-proxy decides the routine founder gates (plan approval, merge, patch and minor releases) and logs each decision in docs/STATUS.md; the founder is asked only about the must-escalate list; briefs carry a "why" line; Tiny tasks get one proxy call, at the merge gate
+
 ## [1.1.1] - 2026-11-16
 
 ### Fixed
