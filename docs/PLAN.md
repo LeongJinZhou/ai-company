@@ -51,3 +51,5 @@ The tier comes from file paths. The lead sets it from the plan's file list and c
 
 ## After this plan
 - [x] Release the lean workflow as v1.1.0.
+- [x] Fix the 2 medium tier-rule gaps found by the second release review (PR #17): the install lists, `rules/`, `templates/`, `*.cmd` and `*.ps1` are Risky.
+- [ ] Release the tier-rule fix as v1.1.1.

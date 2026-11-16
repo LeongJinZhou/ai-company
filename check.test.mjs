@@ -100,6 +100,10 @@ test('handbook names the tiers and the risky paths', () => {
   const risky = (md.match(/^- Risky:[\s\S]*?(?=\n\s*\n|\n- |(?![\s\S]))/m) || [''])[0].toLowerCase();
   assert.ok(risky, 'no "- Risky:" paragraph');
   for (const re of [/auth/, /migration/, /payment/, /dependenc/, /\bci\b/, /script/]) assert.match(risky, re);
+  for (const re of [/plugins\.txt/, /skills\.txt/, /refs\.txt/, /\*\.cmd/, /\*\.ps1/, /`rules\/`/, /`templates\/`/]) assert.match(risky, re);
+  for (const re of [/\*\.sh/, /\*\.bat/, /\*\.command/, /agent instruction files/, /`\.github\/`/]) assert.match(risky, re);
+  const tiny = (md.match(/^- Tiny:[\s\S]*?(?=\n\s*\n|\n- |(?![\s\S]))/m) || [''])[0].toLowerCase();
+  assert.match(tiny, /md, txt/); assert.match(tiny, /whatever its extension/);
 });
 
 test('agent models match the routing table', () => {
