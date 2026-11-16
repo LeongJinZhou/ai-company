@@ -2,59 +2,47 @@
 
 [![ci](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml/badge.svg)](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml)
 
-My personal AI software company for Claude Code.
-I give the order; a Fable founder-proxy decides the routine gates; the lead session plans and checks the work; staff agents and plugin skills do it.
+My personal AI assistant for Claude Code, built like a small software company.
+I give a topic and a few rough points. It studies the product, shows me one short plan, and after my yes it builds, checks its own work and shows me the result.
 
 ## How it works
 
 ```mermaid
 flowchart TD
-    F["Founder<br>gives the order, decides the<br>must-escalate list"] --> FP["founder-proxy: fable<br>decides the routine founder gates"]
-    FP --> L["Lead: main session on opus<br>takes the order, picks workflow,<br>workers, skills and model"]
-    L --> W["Workers<br>ecc:* agents and 13 staff agents"]
-    W --> S["Skills: used, not stored<br>the lead passes SKILL.md paths in each brief"]
-    R["Always on<br>security, scale and testing rules"] -.-> W
-    subgraph M["Model per job"]
-        direction LR
-        M1["fable: plans Risky tasks"]
-        M2["opus: leads, plans Tiny and Normal tasks, checks and reviews"]
-        M3["sonnet: builds, some Normal checks"]
-        M4["haiku: bulk reading"]
-    end
-    L -. "picks one per job" .-> M
+    F["Founder<br>a topic and a few rough points,<br>one yes to the plan"] --> L["Lead: the main session<br>studies, proposes, builds,<br>checks and shows"]
+    L --> S["Skills, picked per task<br>a design skill for every screen,<br>frontend, backend and security standards"]
+    L --> W["12 staff agents, only when needed<br>reviewers for security and screens,<br>builders for independent parts"]
+    R["Always on<br>security and testing rules"] -.-> L
+    R -.-> W
+    D["Only the founder decides<br>deploy, delete, publish, pay, secrets,<br>commit, merge and release"] -.-> L
 ```
 
-## From order to merge
+## From order to result
 
 ```mermaid
 flowchart TD
-    A["Order"] --> T["Tier from the order,<br>re-checked on plan and diff"]
-    T --> B["Propose skills"]
-    B --> C["Plan with a Skills line: the lead on Tiny,<br>opus, or fable plus opus check"]
-    C --> D["Gate 1: founder-proxy decides the plan<br>and its skills (not on Tiny)"]
-    D --> E["Build: sonnet,<br>test-first for code"]
-    E --> G0{"tool gate green?<br>tests, lint, gitleaks, semgrep"}
-    G0 -- no --> E
-    G0 -- yes --> F["Tier crew checks in parallel"]
-    F --> H{"All green?"}
-    H -- no --> I["Fix list, scoped re-check,<br>max 3 rounds"]
-    I --> E2["Fix, tool gate,<br>scoped re-check"]
-    E2 --> H
-    I -- "after 3 rounds" --> Z["Stop and ask the founder"]
-    H -- yes --> J["PR and CI: github-secretary"]
-    J --> K["Merge gate: founder-proxy decides<br>(Tiny: the lead's must-escalate check)"]
-    K --> L["Merge, update STATUS"]
+    A["Order: a topic and rough points"] --> B["1. Study<br>read and run the project, or find out<br>what a good product of this kind has"]
+    B --> S{"Small order?<br>a fix or one clear tweak"}
+    S -- yes --> D
+    S -- no --> C["2. Propose<br>one plan, 15 lines at most: build, look,<br>data and security, left out, skills"]
+    C --> Y{"Founder says yes?"}
+    Y -- "change a line" --> C
+    Y -- yes --> D["3. Build<br>with the plan's skills: design for every screen,<br>clean code, security from the first line"]
+    D --> E["4. Check itself<br>run every feature, look at the screenshot,<br>review the diff, security pass, tests"]
+    E -- "something is off" --> D
+    E -- good --> G["5. Show<br>screenshot or URL, what was assumed,<br>what is not done"]
+    G --> H["Commit, merge, release:<br>only on the founder's word"]
 ```
 
-For each Normal or Risky task founder-proxy (a Fable agent) decides the routine gates: the plan and the merge, and patch and minor releases. The founder is told about each decision and is asked only about the must-escalate list (outward or irreversible actions, money, secrets, specs, first production deploys, major versions, changes to instruction files and scripts, known security findings, skipping or weakening a test, check or gate, 3 failed fix rounds, a requirement the spec does not answer, or Fable is not sure). Tiny tasks (text and docs only) skip founder-proxy: the lead's must-escalate check, one reviewer and the tool gate decide.
+The founder is not interviewed: no rounds of questions. The lead fills the gaps itself from the order, the project and what a good product of that kind has, and puts every choice in the plan. The founder is asked first only for outward or irreversible actions: deploying to production, deleting data or a repo, a force push, making a repo public, messages to real people, a paid service, secrets, and commit, merge and release. Changing the company itself also needs the founder's yes.
 
 ## What is in here
 
 | Path | What |
 |---|---|
 | `claude/CLAUDE.md` | The handbook every session reads first |
-| `claude/rules/` | Always-on rules: security, scale, testing, skill map |
-| `claude/agents/` | 13 staff agents |
+| `claude/rules/` | Rules: security, testing and the skill map are always on; scale applies only when a product needs it |
+| `claude/agents/` | 12 staff agents |
 | `claude/skills/` | 5 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
@@ -100,11 +88,14 @@ flowchart TD
 
 ## Plugins
 
-There are 5 core plugins, always on, and 11 plugins that are off until a task needs them; one more marketplace is added for on-demand installs.
+There is 1 core plugin, always on (caveman), and 15 plugins that are off until a task needs them; one more marketplace is added for on-demand installs.
 
-Core plugins (`on` in `plugins.txt`) load in every session. The rest are
-installed but off, so they cost nothing until needed. `claude/rules/skill-map.md`
-tells the lead which one to enable for which kind of task:
+A plugin that is `on` in `plugins.txt` loads into every session, so the core
+is kept small: with five plugins on, a new session loaded about 76,000 tokens
+before the first word. The rest are installed but off, so they cost nothing
+until needed. Their skill files are still on disk and the lead reads them
+when a task matches. `claude/rules/skill-map.md` tells the lead which skill
+or plugin fits which kind of task, and how to enable one for a project:
 
     claude plugin enable <plugin@marketplace> --scope project
 
@@ -125,7 +116,7 @@ Type `/myoffice` in Claude Code. A local page opens at `http://localhost:4545`
 showing every session and what it is doing. `/myoffice stop` closes it.
 
 First time in each browser: open **Settings** (gear, top right) and turn on
-**Subagents**. They are hidden by default, and without them the workers ECC
+**Subagents**. They are hidden by default, and without them the workers the lead
 sends out never appear. Turn on **Idle** as well to keep finished workers listed.
 
 The page shows your prompts and replies. Start it with `/myoffice --private` before

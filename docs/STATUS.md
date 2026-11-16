@@ -1,6 +1,7 @@
 # Status
 
 ## Done
+- Assistant workflow built on branch `feat/assistant-workflow` on 2026-11-16, on the founder's "Yes, do it" to a plan described in plain words: five steps (study, propose one short plan, build, check itself, show); no interview, one yes; a design skill for every screen; security and testing always on, scale only when the spec needs it; founder-proxy, tiers and gates removed; only caveman stays a core plugin. 24/24 tests. Not merged, not released. Measured on this laptop with `claude -p` on haiku in an empty folder: a new session loaded 76,290 tokens before the change.
 - Kit installed and verified by `node check.mjs`.
 - PRs #1-#11 merged. v1.0.0 released.
 - v1.1.0 released on 2026-11-16 (lean workflow, CI actions v7). Release checks: 15/15 tests, gitleaks clean, security-researcher no blocking advisories. A second security review (opus, on `git diff v1.0.0..main`) finished after the tag and found 2 medium gaps in the tier rule: the install lists (`plugins.txt`, `skills.txt`, `refs.txt`), `rules/`, `templates/`, `*.cmd` and `*.ps1` could count as Tiny and skip the security review. Semgrep did not run in that second check (rules could not be downloaded).
@@ -14,7 +15,8 @@
 - `claude/settings-additions.json` matches the live settings (lead model opus, ECC GateGuard off).
 
 ## Decisions
-- Lead model is opus. A lead that starts on another model warns the founder in one line and waits.
+- Lead model is opus (set in settings). Since the assistant workflow the handbook no longer makes a lead on another model stop and wait.
+- Assistant workflow (2026-11-16): the founder wants to give a topic and rough points, see one plan and say yes, with no spoon-feeding on screens, code order or security. Why the old workflow was dropped: one feature took 6 to 9 agent runs, the handbook told the lead to ask whenever the spec was silent, and nothing told it to make screens good. In a test on the Delta FM project the founder rejected a result that worked but had no design pass.
 - Squash merges only.
 - Repo is private, no licence.
 - Founder-proxy approved by the founder on 2026-11-16 (plan in `docs/PLAN.md`): a Fable agent decides plan approval, merge and patch or minor releases; the founder is informed about each decision and asked only about the must-escalate list. The founder approved in advance the merge of this change's PR and its 1.2.0 release, on condition that every check is green and no medium-or-higher finding is open.

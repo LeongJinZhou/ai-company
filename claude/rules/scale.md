@@ -1,4 +1,9 @@
-# Scale rules (design for large organisations by default)
+# Scale rules (only when the product needs them)
+
+Apply these only when docs/SPEC.md says the product serves several
+organisations or many users. A prototype or a tool for one team does not get
+them. The lines on times and on repeatable actions are common sense and
+always apply.
 
 - Multi-tenant: every owned table has organisation_id; every query
   filters by it.
