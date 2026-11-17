@@ -32,6 +32,9 @@ change or delete them.
   some browsers never fire the "end" event. Always set a timeout.
 
 ## Working method
+- After a file is untracked and git-ignored, switching to a branch that still
+  tracks it replaces it without a warning. Save a copy first
+  (`git hash-object -w` and a ref), restore it after.
 - A lessons file outside every project folder could not be read by sessions
   (permission refused). Company knowledge must live in a skill.
 - In a production sweep a fix changed more than its finding named. Fix what

@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { problems, rows } from './check.mjs';
+import { linkProblems, problems, rows, runs, settingsProblems, toolProblems, tools } from './check.mjs';
 
 const here = (p) => join(import.meta.dirname, p);
 const read = (p) => readFileSync(here(p), 'utf8');
@@ -75,6 +76,64 @@ test('settings-additions.json sets the lead model and turns GateGuard off', () =
   const s = JSON.parse(read('claude/settings-additions.json'));
   assert.equal(s.model, 'opus');
   assert.equal(s.env?.ECC_GATEGUARD, 'off');
+  // update.sh adds every key in this file to every laptop without asking. A new key
+  // must first be named in the README section "What you need", then added here.
+  assert.deepEqual(Object.keys(s).sort(), ['attribution', 'env', 'model', 'statusLine']);
+  assert.deepEqual(Object.keys(s.env), ['ECC_GATEGUARD']);
+});
+
+test('the check reports a file that is not linked and a tool that does not run', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'kit-check-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  const file = (path) => { mkdirSync(join(dir, path, '..'), { recursive: true }); writeFileSync(join(dir, path), ''); };
+  for (const path of ['kit/agents/a.md', 'kit/agents/b.md', 'kit/rules/r.md', 'kit/templates/t.yml']) file(path);
+  for (const path of ['home/agents/a.md', 'home/rules/r.md']) file(path);
+  const home = join(dir, 'home');
+  assert.deepEqual(linkProblems(join(dir, 'kit'), home), [`agents/b.md: not linked into ${home}`, `templates/t.yml: not linked into ${home}`]);
+  file('home/agents/b.md');
+  file('home/templates/t.yml');
+  assert.deepEqual(linkProblems(join(dir, 'kit'), home), []);
+  // On the real repo every linked folder exists and holds files.
+  assert.ok(linkProblems(here('claude'), join(dir, 'empty')).length >= 13 + 3 + 5);
+
+  const asked = [];
+  const works = (command) => { asked.push(command); return command !== 'semgrep --version'; };
+  assert.deepEqual(toolProblems(['gh', 'semgrep'], works), ['semgrep: not installed; run the installer again']);
+  assert.deepEqual(asked, ['gh --version', 'semgrep --version']);
+  assert.equal(runs('node --version'), true);
+  assert.equal(runs('no-such-tool-of-the-kit --version'), false);
+});
+
+test('every laptop gets the same settings, connections and tools as the first one', () => {
+  const kit = JSON.parse(read('claude/settings-additions.json'));
+  assert.deepEqual(settingsProblems({}, kit), ['model', 'env', 'attribution', 'statusLine'].map((key) => `settings.json: ${key} is missing; run bash update.sh`));
+  assert.deepEqual(settingsProblems({ model: 'sonnet', env: {} }, { model: 'opus', env: { ECC_GATEGUARD: 'off' } }), [
+    'settings.json: env.ECC_GATEGUARD is missing; run bash update.sh',
+  ]);
+  assert.deepEqual(settingsProblems({ ...kit, model: 'sonnet', theme: 'dark' }, kit), []);
+  assert.deepEqual(settingsProblems(null, kit), ['settings.json: cannot be read as a JSON object; repair the file, then run bash update.sh']);
+  // update.sh writes the settings; nobody has to merge a file by hand.
+  assert.ok(read('update.sh').includes('node "$KIT/settings-merge.mjs"'), 'update.sh does not merge the settings');
+  const win = read('install-windows.bat');
+  const mac = read('install-mac.command');
+  for (const installer of [win, mac]) {
+    assert.doesNotMatch(installer, /Merge claude/);
+    assert.ok(installer.includes('claude mcp add --scope user playwright npx @playwright/mcp@latest'));
+    assert.ok(installer.includes('claude mcp add --scope user --transport http sentry https://mcp.sentry.dev/mcp'));
+  }
+  // check.mjs fails on a missing tool, so both installers must install every one.
+  const winName = { gh: 'GitHub.cli', gitleaks: 'Gitleaks.Gitleaks', semgrep: 'pip install semgrep', 'osv-scanner': 'Google.OSVScanner', bun: 'Oven-sh.Bun', ccusage: 'npm install -g ccusage' };
+  const brew = mac.match(/^brew install (.*)$/m)[1].split(/\s+/).map((formula) => formula.split('/').pop());
+  for (const tool of tools) {
+    assert.ok(win.includes(winName[tool]), `install-windows.bat does not install ${tool}`);
+    assert.ok(brew.includes(tool) || mac.includes(`npm install -g ${tool}`), `install-mac.command does not install ${tool}`);
+  }
+  all(read('check.mjs'), [/runs\('claude mcp get playwright'\)/, /toolProblems\(tools, runs\)/, /linkProblems\(join\(kit, 'claude'\), dest\)/]);
+  all(section(read('README.md'), 'What you need'), [
+    /`~\/\.claude\/settings\.json`/, /A value you set yourself is never changed/, /`settings\.json\.backup`/,
+    /A key you delete is added again on the next update/, /the Sentry MCP server/, /claude mcp remove sentry -s user/,
+  ]);
+  assert.doesNotMatch(section(read('README.md'), 'Install'), /Merge `claude\/settings-additions\.json`/);
 });
 
 test('README counts match the files', () => {
@@ -248,6 +307,7 @@ test('the founder\'s own lessons never leave the laptop', () => {
   const starter = read('claude/skills/lessons/starter.md');
   assert.match(starter, /git ignores it, so what you\s+write never leaves this laptop/);
   assert.doesNotMatch(starter, /\b20\d\d-\d\d-\d\d\b/, 'the starter carries a dated note from one founder');
+  assert.match(starter, /switching to a branch that still\s+tracks it replaces it without a warning/);
 });
 
 test('anyone may use the kit', () => {

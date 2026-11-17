@@ -60,6 +60,7 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 | `skills.txt` | Skills pulled from their own GitHub repo (`/myoffice`: live view of all agents) |
 | `.claude-plugin/marketplace.json` | This repo as a plugin marketplace (the blast-radius plugin) |
 | `update.sh`, `check.mjs` | Update everything to latest, then verify |
+| `claude/settings-additions.json`, `settings-merge.mjs` | The kit's settings, and the script that adds the missing ones to `~/.claude/settings.json` |
 | `office-proxy.mjs`, `office-remote.cmd` | Private phone access to the office page |
 | `docs/STATUS.md` | Project state: done, decisions, benchmark, open issues |
 | `CHANGELOG.md` | What changed, one line per change |
@@ -78,7 +79,8 @@ The installer changes your machine. Read `install-windows.bat` or `install-mac.c
 - The handbook goes to `~/.claude/CLAUDE.md`. On Mac a file that is already there is renamed to `CLAUDE.md.backup`. On Windows it is copied to `CLAUDE.md.backup` once, and then replaced at install and on every `bash update.sh`.
 - Git, for every repo on the machine: the global hooks path is set to `claude/git-hooks`, so a repo's own `.git/hooks` no longer run unless that repo sets its own hooks path. The `commit-msg` hook removes Claude co-author and "Generated with Claude Code" lines from every commit message; the `pre-commit` hook runs gitleaks. The default branch name becomes `main`, and GitHub CLI becomes git's sign-in helper for GitHub (`gh auth setup-git`). To undo the hooks: `git config --global --unset core.hooksPath`.
 - GitHub CLI asks you to sign in (`gh auth login`) if you are not signed in.
-- Claude Code: the Playwright MCP server, every plugin in `plugins.txt`, the built-in plugin `cc-plugin-you-should-know`, the 4 reference repos of `refs.txt` in `~/.claude/vendor`, and the myoffice skill from the repo named in `skills.txt`.
+- Claude Code: the Playwright MCP server, the Sentry MCP server, every plugin in `plugins.txt`, the built-in plugin `cc-plugin-you-should-know`, the 4 reference repos of `refs.txt` in `~/.claude/vendor`, and the myoffice skill from the repo named in `skills.txt`. Sentry is a connection to `https://mcp.sentry.dev/mcp` that the site-monitor agent uses; nothing is sent until you sign in with your own Sentry account. If you do not use Sentry, remove it: `claude mcp remove sentry -s user`.
+- `~/.claude/settings.json`: at install and on every `bash update.sh`, the keys of `claude/settings-additions.json` that your file lacks are added: the lead model (`opus`), ECC GateGuard off, no Claude attribution on commits and pull requests, and the ccusage status line. A value you set yourself is never changed. A key you delete is added again on the next update: to differ from the kit, set your own value instead of deleting the key. The file as it was before the first change is kept as `settings.json.backup`, unless a file of that name is already there. GateGuard is ECC's check-before-edit gate; the blast-radius plugin is the preview for risky shell commands.
 
 ## What it costs
 
@@ -90,10 +92,9 @@ You pay for tokens through your Claude plan or API key; the kit itself is free. 
    `git clone https://github.com/LeongJinZhou/ai-company` (the repo is public; no sign-in is needed to clone it).
    To change the company for yourself, fork it first and clone your fork.
 2. Double-click `install-windows.bat` (Windows) or `install-mac.command` (Mac).
-3. Merge `claude/settings-additions.json` into `~/.claude/settings.json`. The file sets the lead model (`opus`), turns ECC GateGuard off, clears commit and PR attribution, and sets the ccusage status line. GateGuard is ECC's check-before-edit gate; the blast-radius plugin is the preview for risky shell commands.
-4. Restart Claude Code.
+3. Restart Claude Code.
 
-The installer prints `OK: ...` when the laptop matches `plugins.txt`.
+The installer prints `OK: ...` when the laptop matches the repo: plugins, reference repos, skills, agents, rules, handbook, settings, the browser connection and the tools. Every laptop that prints `OK` has the same company. The one thing no install can set is the model you pick: in the desktop app the model picker overrides the `opus` setting, so choose the model there for each new session.
 
 ## Update (any laptop, any time)
 
@@ -110,7 +111,9 @@ flowchart TD
     P["plugins.txt"] --> PI["plugins installed,<br>on or off"]
     X["refs.txt"] --> V["~/.claude/vendor"]
     S["skills.txt"] --> K["~/.claude/skills"]
-    H -- "CLAUDE.md and agents" --> C["check.mjs prints OK"]
+    A["settings-additions.json"] --> T["~/.claude/settings.json<br>missing keys added"]
+    T --> C
+    H -- "CLAUDE.md, agents, rules" --> C["check.mjs prints OK"]
     PI --> C
     V --> C
     K --> C
