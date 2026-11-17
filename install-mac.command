@@ -16,8 +16,9 @@ chmod +x claude/git-hooks/*
 git config --global core.hooksPath "$PWD/claude/git-hooks"
 git config --global init.defaultBranch main
 claude mcp add --scope user playwright npx @playwright/mcp@latest || true
+# Sentry: the site-monitor agent reads errors through it. You sign in with your own Sentry account on first use.
+claude mcp add --scope user --transport http sentry https://mcp.sentry.dev/mcp || true
 gh auth status >/dev/null 2>&1 || gh auth login
 # Plugins, reference repos and the final check. Re-run update.sh any time to update.
 bash "$PWD/update.sh" --no-pull
-echo "Done. Merge claude/settings-additions.json into ~/.claude/settings.json if not done yet."
-echo "Then open a folder in VS Code and run: claude"
+echo "Open a folder in VS Code and run: claude"

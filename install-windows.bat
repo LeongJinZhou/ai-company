@@ -23,9 +23,10 @@ copy /Y "claude\CLAUDE.md" "%USERPROFILE%\.claude\CLAUDE.md"
 git config --global core.hooksPath "%CD:\=/%/claude/git-hooks"
 git config --global init.defaultBranch main
 call claude mcp add --scope user playwright npx @playwright/mcp@latest
+REM Sentry: the site-monitor agent reads errors through it. You sign in with your own Sentry account on first use.
+call claude mcp add --scope user --transport http sentry https://mcp.sentry.dev/mcp
 gh auth status >nul 2>&1 || gh auth login
 REM Plugins, reference repos and the final check. Re-run update.sh any time to update.
 "%ProgramFiles%\Git\bin\bash.exe" "%CD%\update.sh" --no-pull
-echo Done. Merge claude\settings-additions.json into %USERPROFILE%\.claude\settings.json if not done yet.
 echo If a tool is "not found", close and reopen the terminal, then run this file again.
 pause

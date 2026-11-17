@@ -4,6 +4,17 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-11-18
+
+### Added
+- `bash update.sh` adds the kit's settings to `~/.claude/settings.json` itself (`settings-merge.mjs`): the lead model, ECC GateGuard off, no attribution lines, the ccusage status line. Only missing keys are added, a value you set yourself is never changed, and the file as it was is kept once as `settings.json.backup`. Nobody has to merge `claude/settings-additions.json` by hand any more
+- Both installers add the Sentry MCP server, which the site-monitor agent uses; you sign in with your own Sentry account. A laptop installed before 2.0.1 gets it with `claude mcp add --scope user --transport http sentry https://mcp.sentry.dev/mcp`
+- `check.mjs` also fails when a kit setting is missing, when the Playwright connection is missing, when one of gh, gitleaks, semgrep, osv-scanner, bun or ccusage does not run, or when a rule or template is not linked. `OK` now means the laptop has the same company as every other laptop that prints `OK`
+- The starter lessons hold the git lesson about a file that was untracked and ignored
+
+### Changed
+- The installers no longer end with "merge the settings file"
+
 ## [2.0.0] - 2026-11-17
 
 ### Added

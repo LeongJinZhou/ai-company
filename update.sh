@@ -2,7 +2,7 @@
 # Brings this laptop to the latest company setup. Safe to re-run any time:
 # pulls this repo, every marketplace, every plugin and every reference repo.
 #   bash update.sh          update, then check
-#   bash update.sh --check  only check that this machine matches the repo (plugins, reference repos, skills, agents, handbook)
+#   bash update.sh --check  only check that this machine matches the repo (plugins, reference repos, skills, agents, rules, handbook, settings, tools)
 # First-time setup is install-windows.bat / install-mac.command, which call this.
 set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,6 +32,10 @@ fi
 # ignores the file, so what you write in it stays on this laptop.
 LESSONS="$KIT/claude/skills/lessons"
 [ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/starter.md" "$LESSONS/SKILL.md"
+
+# The kit's settings (lead model, status line, no attribution lines): added
+# when missing, never changed when you set your own value.
+node "$KIT/settings-merge.mjs" || echo "WARN: settings.json was not changed; see the message above." >&2
 
 # Failures in the loops below are not fatal on their own ("already added",
 # "already disabled" are normal). check.mjs at the end decides pass/fail.

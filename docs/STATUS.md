@@ -1,6 +1,7 @@
 # Status
 
 ## Done
+- 2.0.1 (2026-11-18): every laptop gets the same company without a manual step. `update.sh` adds the kit's missing settings to `~/.claude/settings.json` (never changes a value the user set, keeps one backup), the installers add the Sentry connection, and `check.mjs` also verifies settings, the Playwright connection, the tools and the rules and templates links. Found by comparing the first founder's laptop with what the repo installs: skills, agents, rules, plugins, reference repos and tools matched; the settings, the Sentry connection and one lesson did not reach other users.
 - 2.0.0 (2026-11-17): the kit is ready for anyone to use. MIT licence. The founder's own lessons live in a file git ignores, created once from `claude/skills/lessons/starter.md`. The README says who the kit is for, what it needs, what the installer changes and what a task cost. The handbook no longer describes one person. `docs/PLAN.md` (the plan for 1.3.0) is removed. Release checks: 31/31 tests, gitleaks clean on the full history and the working files, code-reviewer and security-reviewer (opus) on the whole change with every medium or higher finding fixed and re-checked by the reviewer that raised it. Semgrep did not run. No full install on an empty machine was run; the new lessons lines of `update.sh` and the new backup line of `install-windows.bat` were each run twice against a temp folder.
 - Safety net (PR 26): a local checkpoint before every substantial change and the word "undo" to go back; a database change that can lose data asks first and is backed up first; reports say what a thing does for the user before its technical name.
 - Business sense and learning (PR 25): the product-sense skill, two plan lines ("Worth building because", "My advice"), an "I noticed" line in the report, the lessons skill, a rule-change proposal after two corrections of the same kind. Not added: departments, a CEO agent, agents on a schedule.
@@ -40,8 +41,8 @@ Each run with `claude -p` on an opus lead in a throwaway folder; cost from the r
 - The older rows (tiers and founder-proxy, 2026-11-16) are in the git history of this file.
 
 ## Open issues
-- The installers do not merge `claude/settings-additions.json` automatically.
-- `check.mjs` does not verify the rules and templates links.
+- `check.mjs` does not check the Sentry connection (a user without Sentry may remove it), the git hooks path, or which model a session really runs on.
+- A laptop installed before 2.0.1 does not get the Sentry connection from `bash update.sh`; the command is in `CHANGELOG.md` under 2.0.1.
 - CI actions are pinned by tag, not commit SHA. CI uses `node-version: 22`, which floats to the latest 22.x.
 - Plugins in `plugins.txt` are unpinned, and nobody has checked them one by one for advisories. They run their own code on the machine.
 - The installers leave ccusage and semgrep unpinned.
@@ -54,4 +55,4 @@ Each run with `claude -p` on an opus lead in a throwaway folder; cost from the r
 - This repo has no `docs/SPEC.md` of its own.
 
 ## Next step
-On every laptop that runs 1.x: `bash update.sh`, then restart Claude Code.
+On every laptop: `bash update.sh`, then restart Claude Code. It must end with `OK: ...`.
