@@ -35,7 +35,7 @@ flowchart TD
     G --> P["Production, on the founder's word:<br>full sweep of the whole product<br>before real users or real data"]
 ```
 
-The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short file, `~/.claude/LESSONS.md`, read when a project starts.
+The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, `claude/skills/lessons/SKILL.md`, read when a project starts.
 
 There are two modes. Building (steps 1 to 5) is the default and checks each change: the builder never has the last word, a code-reviewer reads every code change, and new screens and risky changes get their own reviewer. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
 
@@ -48,7 +48,7 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 | `claude/CLAUDE.md` | The handbook every session reads first |
 | `claude/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
 | `claude/agents/` | 13 staff agents |
-| `claude/skills/` | 7 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature) |
+| `claude/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects) |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
 | `plugins.txt` | Every plugin, and whether it is on or off |

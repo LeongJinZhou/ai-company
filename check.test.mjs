@@ -211,15 +211,18 @@ test('the lead thinks like a business partner, and the company learns', () => {
   const md = read('claude/CLAUDE.md');
   all(section(md, '1\\. Study'), [
     /The founder's projects are business projects/, /For a new product or a\s+large feature also use the product-sense skill/,
-    /Minutes, not a\s+report/, /Read `~\/\.claude\/LESSONS\.md` when a project starts/,
+    /Minutes, not a\s+report/, /Use the lessons skill when a project starts/,
   ]);
+  // Lessons live in a skill: a session can always load a skill, but not a file outside its project folder.
+  all(read('claude/skills/lessons/SKILL.md'), [/^name: lessons$/m, /^description: .*Use in the Study step when a project starts/m, /Verified things only/, /60 lines at\s+most/]);
+  assert.ok(read('claude/skills/lessons/SKILL.md').trimEnd().split(/\r?\n/).length <= 70, 'lessons skill over 70 lines');
   all(section(md, '2\\. Propose'), [
     /Worth building because: the user, the problem, why they would choose this/,
     /My advice: only when you would build less, build something different, or\s+not build it/, /Say why, plainly\. The founder decides/,
   ]);
   assert.match(section(md, '5\\. Show'), /End with one line\s+"I noticed"/);
   all(section(md, 'The company learns'), [
-    /Verified things only, three lines\s+each at most, newest first, 60 lines at most/, /This one file needs no yes/,
+    /The lessons skill \(`~\/\.claude\/skills\/lessons\/SKILL\.md`\)/, /Verified things only, three lines each at most, newest first, 60 lines at\s+most/, /This\s+one file needs no yes/,
     /corrects the same kind of thing twice, propose one rule\s+change in plain words/, /Change nothing without the yes/,
   ]);
   assert.match(section(md, 'Every project remembers'), /what problem it solves,\s+how success is measured/);

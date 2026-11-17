@@ -23,8 +23,8 @@ The main session is the lead: it talks to the founder and does the work.
   large feature also use the product-sense skill: who it is for, what
   already exists, the simpler way, what it costs to run. Minutes, not a
   report.
-- Read `~/.claude/LESSONS.md` when a project starts, or when the task is of
-  a kind it names.
+- Use the lessons skill when a project starts, or when the task is of a
+  kind it names.
 - Never interview the founder. No question lists, no multiple-choice rounds.
 
 ### 2. Propose: one short plan, one yes
@@ -118,10 +118,11 @@ in step 5. A new project starts with the new-project skill. This is what lets
 a short prompt work weeks later.
 
 ## The company learns
-- `~/.claude/LESSONS.md` holds what was learned across all projects: what
-  worked, what failed, what cost too much. Verified things only, three lines
-  each at most, newest first, 60 lines at most. When a task teaches something
-  a later project needs, add it. This one file needs no yes.
+- The lessons skill (`~/.claude/skills/lessons/SKILL.md`) holds what was
+  learned across all projects: what worked, what failed, what cost too much.
+  Verified things only, three lines each at most, newest first, 60 lines at
+  most. When a task teaches something a later project needs, add it. This
+  one file needs no yes.
 - When the founder corrects the same kind of thing twice, propose one rule
   change in plain words. Change nothing without the yes.
 

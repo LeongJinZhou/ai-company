@@ -13,7 +13,7 @@ rules.
 
 The company's own skills are always there: new-project, brief-to-spec,
 frontend-standards, backend-standards, security-checklist, scale-standards,
-product-sense.
+product-sense, lessons.
 
 Enable a plugin only when the task needs its commands, hooks or agents, for
 that project only, from the project folder:
