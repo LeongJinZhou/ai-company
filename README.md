@@ -11,7 +11,7 @@ I give a topic and a few rough points. It studies the product, shows me one shor
 flowchart TD
     F["Founder<br>a topic and a few rough points,<br>one yes to the plan"] --> L["Lead: the main session<br>studies, proposes, builds,<br>checks and shows"]
     L --> S["Skills, picked per task<br>a design skill for every screen,<br>frontend, backend and security standards"]
-    L --> W["12 staff agents, only when needed<br>reviewers for security and screens,<br>builders for independent parts"]
+    L --> W["13 staff agents<br>independent reviewers for code, security<br>and screens; builders for independent parts"]
     R["Always on<br>security and testing rules"] -.-> L
     R -.-> W
     D["Only the founder decides<br>deploy, delete, publish, pay, secrets,<br>commit, merge and release"] -.-> L
@@ -28,11 +28,14 @@ flowchart TD
     C --> Y{"Founder says yes?"}
     Y -- "change a line" --> C
     Y -- yes --> D["3. Build<br>with the plan's skills: design for every screen,<br>clean code, security from the first line"]
-    D --> E["4. Check itself<br>run every feature, look at the screenshot,<br>review the diff, security pass, tests"]
+    D --> E["4. Check<br>tools and a real browser, then independent reviewers:<br>code always, screens, security"]
     E -- "something is off" --> D
     E -- good --> G["5. Show<br>screenshot or URL, what was assumed,<br>what is not done"]
     G --> H["Commit, merge, release:<br>only on the founder's word"]
+    G --> P["Production, on the founder's word:<br>full sweep of the whole product<br>before real users or real data"]
 ```
+
+There are two modes. Building (steps 1 to 5) is the default and checks each change: the builder never has the last word, a code-reviewer reads every code change, and new screens and risky changes get their own reviewer. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
 
 The founder is not interviewed: no rounds of questions. The lead fills the gaps itself from the order, the project and what a good product of that kind has, and puts every choice in the plan. The founder is asked first only for outward or irreversible actions: deploying to production, deleting data or a repo, a force push, making a repo public, messages to real people, a paid service, secrets, and commit, merge and release. Changing the company itself also needs the founder's yes.
 
@@ -42,7 +45,7 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 |---|---|
 | `claude/CLAUDE.md` | The handbook every session reads first |
 | `claude/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
-| `claude/agents/` | 12 staff agents |
+| `claude/agents/` | 13 staff agents |
 | `claude/skills/` | 6 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale) |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |

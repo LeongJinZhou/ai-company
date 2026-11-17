@@ -9,6 +9,8 @@ pass.
 - Every feature is run through the real product before it is shown. With
   screens: clicked through in a real browser. Without screens: driven
   through its real entry point.
+- Each finished feature leaves one saved browser test (Playwright) of its
+  main path, so a later change cannot quietly break it.
 - Lint and typecheck pass where the project has them.
 
 ## Before real users or real data

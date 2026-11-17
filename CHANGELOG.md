@@ -11,6 +11,8 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 - brief-to-spec writes the spec from its own study with recorded defaults and a look-and-theme section; github-secretary merges and releases only on the founder's word
 - The scale rules moved from `claude/rules/` (loaded into every session) to the scale-standards skill (read on demand); the handbook has a Cost section: read only what the task needs, batch calls, sub-agents only when they save context, a new session per task
 - A change to a permission check or a database query now also goes to security-reviewer. The benchmark of 2026-11-17 showed that such a change (order 3) was checked only by the lead itself
+- Two modes. Building checks each change with independent reviewers: tools first, a new code-reviewer agent on every code change, ux-reviewer on every new screen, architect on the data model of a new project with a database or login, one saved browser test per feature. Production is the full sweep of the whole product on the founder's word "production", before real users or real data
+- The skill map points a bug that survived one fix to the systematic-debugging skill file on disk, with the plugin off
 
 ### Removed
 - founder-proxy, the tiers (Tiny, Normal, Risky), the founder gates and the chain of planner, approver, builder and reviewers per feature

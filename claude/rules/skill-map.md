@@ -40,6 +40,7 @@ plugin "just in case".
 | Memory across sessions beyond docs/SPEC.md and docs/STATUS.md | claude-mem@thedotmack | |
 | Strict step-by-step process: brainstorm, plan, TDD | superpowers@superpowers-dev | asks many questions; only when the founder wants that |
 | Extra-minimal code mode | ponytail@ponytail | removes polish nobody asked for; not for screens |
+| A bug that survived one fix | none: read the file | `~/.claude/plugins/cache/superpowers-dev/**/skills/systematic-debugging/SKILL.md`; the plugin stays off |
 
 More plugins, install on demand: `claude plugin install <name>@claude-code-plugins`
 (feature-dev, pr-review-toolkit, security-guidance, hookify, frontend-design, ...).
