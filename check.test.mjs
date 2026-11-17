@@ -164,7 +164,8 @@ test('security is always on, scale only when the product needs it', () => {
   assert.doesNotMatch(read('claude/skills/backend-standards/SKILL.md'), /organisation_id|large organisations/);
   all(read('claude/rules/security.md'), [/from the first line of a prototype/, /Never\s+skip a rule that does apply/, /parameterised queries/, /No secrets in frontend code/]);
   all(section(md, '3\\. Build'), [/Server\s+code: backend-standards and security-checklist/, /apply from the first\s+line of a prototype/, /Secrets, tokens, keys and anything worth stealing\s+live on the server/]);
-  all(section(md, '4\\. Check yourself'), [/against the security-checklist skill/, /Login,\s+payment, upload, personal data or a new dependency also goes to\s+security-reviewer/, /security-researcher/]);
+  all(section(md, '4\\. Check yourself'), [/against the security-checklist skill/, /Login,\s+permission checks, database queries, payment, upload, personal data or a\s+new dependency also goes to security-reviewer/, /security-researcher/]);
+  assert.match(read('claude/agents/security-reviewer.md'), /^description: .*login, permission checks, database queries, payment, upload, personal data or a new dependency/m);
 });
 
 test('code stays in order and one feature is not a chain of agents', () => {

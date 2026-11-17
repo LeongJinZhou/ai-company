@@ -64,8 +64,9 @@ with your pick first. That is the only kind of question.
 - Read your own diff as a reviewer: tangled code, dead code, missing error
   handling.
 - Security: check the diff against the security-checklist skill. Login,
-  payment, upload, personal data or a new dependency also goes to
-  security-reviewer; a new dependency to security-researcher.
+  permission checks, database queries, payment, upload, personal data or a
+  new dependency also goes to security-reviewer; a new dependency to
+  security-researcher.
 - Tests and lint pass.
 
 ### 5. Show
