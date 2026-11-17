@@ -63,7 +63,7 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 ## New laptop
 
 1. Install Git, then clone this repo into your home folder:
-   `git clone https://github.com/LeongJinZhou/ai-company` (sign in when asked; the repo is private).
+   `git clone https://github.com/LeongJinZhou/ai-company` (the repo is public; no sign-in is needed to clone it).
 2. Double-click `install-windows.bat` (Windows) or `install-mac.command` (Mac).
 3. Merge `claude/settings-additions.json` into `~/.claude/settings.json`. The file sets the lead model (`opus`), turns ECC GateGuard off, clears commit and PR attribution, and sets the ccusage status line. GateGuard is ECC's check-before-edit gate; the blast-radius plugin is the preview for risky shell commands.
 4. Restart Claude Code.
@@ -147,5 +147,5 @@ now. Never use `tailscale funnel` for this: that would make the page public.
 
 ## Security notes
 
-- This repo is private.
+- This repo is public. It holds the working method only: rules, agents, skills and the installer. Project code stays in its own private repos.
 - No secrets, .env files or real data go in this repo. The `pre-commit` hook in `claude/git-hooks/` runs gitleaks on staged changes and blocks the commit if it finds a secret. It does nothing if gitleaks is not installed. It needs gitleaks 8.19 or newer; the installers install gitleaks.

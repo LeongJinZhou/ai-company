@@ -15,6 +15,8 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 - The skill map points a bug that survived one fix to the systematic-debugging skill file on disk, with the plugin off
 - Business thinking: a new product-sense skill (who it is for, what exists, the simpler way, success numbers, cost to run), read only for a new product or large feature; the plan says why the product is worth building and gives plain advice when the lead would build less or something different
 - The company learns: the lessons skill holds verified lessons across all projects (a skill, because a session cannot read a file outside its project folder), and the lead proposes one rule change when the founder corrects the same kind of thing twice
+- Safety net: a local checkpoint before every substantial change and the word "undo" to return to it; a database change that can lose data asks first and is backed up first; reports say what a thing does for the user before its technical name and list what changed
+- The README says the repo is public (the founder's decision of 2026-11-17)
 
 ### Removed
 - founder-proxy, the tiers (Tiny, Normal, Risky), the founder gates and the chain of planner, approver, builder and reviewers per feature

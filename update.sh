@@ -15,7 +15,7 @@ done
 
 if [ "$MODE" = --check ]; then exec node "$KIT/check.mjs"; fi
 
-# This repo is private and is also a plugin marketplace, so git needs the GitHub login.
+# This repo is also a plugin marketplace; git uses the GitHub login when there is one.
 command -v gh >/dev/null && gh auth setup-git >/dev/null 2>&1
 
 if [ "$MODE" != --no-pull ]; then

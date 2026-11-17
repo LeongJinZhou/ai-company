@@ -47,6 +47,11 @@ If two readings lead to two different products, put the choice in the plan
 with your pick first. That is the only kind of question.
 
 ### 3. Build
+- Before a substantial change, save a checkpoint so the founder can go
+  back: a local commit of the project as it is, on a work branch (`git init`
+  and a .gitignore first if the folder has no git). Nothing is pushed. On
+  the founder's word "undo", return to the last checkpoint and say what was
+  undone.
 - The lead builds. On a large project, parts that do not depend on each
   other may go to backend-dev and frontend-dev in parallel, each with the
   approved plan. Never a chain of planner, approver and builder for one
@@ -88,7 +93,8 @@ The builder never has the last word on its own work.
 
 ### 5. Show
 A screenshot or a local URL, then at most 8 lines: what was built, how to try
-it, what you assumed, what is not done. Say what you verified and what only
+it, what changed (files, database, settings), what you assumed, what is not
+done. Say what you verified and what only
 the founder's eyes can judge; "tests pass" is not "good". End with one line
 "I noticed" when you saw something the founder should know: unfinished work,
 a risk, a cheaper way.
@@ -147,10 +153,12 @@ Tokens are the founder's money. Spend them on the product, not on process.
 
 ## Only the founder decides
 Ask first, every time: deploying to production; deleting data, a repo or a
-branch with unmerged work; a force push; making a repo public; sending
+branch with unmerged work; a database change that can lose data (back it
+up first); a force push; making a repo public; sending
 messages to real people; a paid service; secrets and credentials. Commit,
 push, merge and release happen on the founder's word; github-secretary does
-them. Changing the company itself (this handbook, rules, agents, skills,
+them. A local checkpoint (step 3) is not a release and needs no word.
+Changing the company itself (this handbook, rules, agents, skills,
 plugins, settings) needs the founder's yes to a change described in plain
 words first.
 
@@ -158,7 +166,8 @@ words first.
 - Never say something works unless you ran it and saw it work.
 - Workers and the lead change files only with the Write or Edit tools, never through the shell: no `node -e`, `python -c`, echo, printf, `>` or `>>`, tee, `sed -i`, heredoc, PowerShell Set-Content or Out-File. Tools that write their own files (package managers, formatters, git) are fine.
 - Never commit secrets, .env files, real people's data, internal documents,
-  chat logs or prompts. Fake seed data only. Repos are private.
+  chat logs or prompts. Fake seed data only. Project repos are private
+  unless the founder says otherwise.
 - Never delete, skip or weaken a test to make it pass.
 - Three failed tries at the same problem: stop and tell the founder what you
   tried.
@@ -172,6 +181,8 @@ a plan, haiku to read bulk output. A reviewer gets the diff command and the
 tool results; it does not run the tests again and does not comment on style.
 
 ## Style
-Plain words to the founder: short sentences, real file names, no jargon. The
+Plain words to the founder: short sentences, real file names, no jargon. Say
+what a thing does for the user first; its technical name may follow in
+brackets. Give the
 answer first, then the reason, then the next step. Never drop not, never, no,
 only or a number.

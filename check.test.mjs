@@ -236,6 +236,19 @@ test('the lead thinks like a business partner, and the company learns', () => {
   for (const f of readdirSync(here('claude/agents'))) assert.doesNotMatch(f, /ceo|finance|marketing|sales/i, `${f}: a department agent`);
 });
 
+test('the founder can always go back, and reports are in plain words', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, '3\\. Build'), [
+    /Before a substantial change, save a checkpoint so the founder can go\s+back/, /a local commit of the project as it is, on a work branch/,
+    /`git init`\s+and a \.gitignore first if the folder has no git/, /Nothing is pushed/, /On\s+the founder's word "undo", return to the last checkpoint/,
+  ]);
+  all(section(md, 'Only the founder decides'), [
+    /a database change that can lose data \(back it\s+up first\)/, /A local checkpoint \(step 3\) is not a release and needs no word/,
+  ]);
+  assert.match(section(md, '5\\. Show'), /what changed \(files, database, settings\)/);
+  assert.match(section(md, 'Style'), /Say\s+what a thing does for the user first; its technical name may follow in\s+brackets/);
+});
+
 test('testing grows with the product', () => {
   const t = read('claude/rules/testing.md');
   all(t, [/one saved browser test \(Playwright\) of its\s+main path/,/^## Prototype \(the default\)$/m, /^## Before real users or real data$/m, /Never delete, skip or weaken a test/, /the failing test first/, /clicked through in a real browser/, /80%\+/, /CI on GitHub green/]);
@@ -267,7 +280,7 @@ test('hard rules forbid shell file writes and false claims', () => {
   assert.match(rules, /heredoc/i);
   all(rules, [
     /only with the Write or Edit tools, never through the shell/, /unless you ran it and saw it work/, /Never delete, skip or weaken a test/,
-    /Never commit secrets, \.env files, real people's data/, /Repos are private/, /Three failed tries/,
+    /Never commit secrets, \.env files, real people's data/, /Project repos are private\s+unless the founder says otherwise/, /Three failed tries/,
   ]);
 });
 
@@ -306,6 +319,6 @@ test('tokens are spent on the product, not on process', () => {
 
 test('handbook stays within its line budget', () => {
   const md = read('claude/CLAUDE.md');
-  assert.ok(md.trimEnd().split(/\r?\n/).length <= 185, 'handbook over 185 lines');
-  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 9900, 'handbook over 9900 bytes');
+  assert.ok(md.trimEnd().split(/\r?\n/).length <= 195, 'handbook over 195 lines');
+  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 10500, 'handbook over 10500 bytes');
 });
