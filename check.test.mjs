@@ -207,6 +207,32 @@ test('production is the full sweep of the whole product, on the founder\'s word'
   ]);
 });
 
+test('the lead thinks like a business partner, and the company learns', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, '1\\. Study'), [
+    /The founder's projects are business projects/, /For a new product or a\s+large feature also use the product-sense skill/,
+    /Minutes, not a\s+report/, /Read `~\/\.claude\/LESSONS\.md` when a project starts/,
+  ]);
+  all(section(md, '2\\. Propose'), [
+    /Worth building because: the user, the problem, why they would choose this/,
+    /My advice: only when you would build less, build something different, or\s+not build it/, /Say why, plainly\. The founder decides/,
+  ]);
+  assert.match(section(md, '5\\. Show'), /End with one line\s+"I noticed"/);
+  all(section(md, 'The company learns'), [
+    /Verified things only, three lines\s+each at most, newest first, 60 lines at most/, /This one file needs no yes/,
+    /corrects the same kind of thing twice, propose one rule\s+change in plain words/, /Change nothing without the yes/,
+  ]);
+  assert.match(section(md, 'Every project remembers'), /what problem it solves,\s+how success is measured/);
+  const ps = read('claude/skills/product-sense/SKILL.md');
+  all(ps, [
+    /^description: .*never for a fix or a small change/m, /one or\s+two web searches at most/, /or "not checked"/, /The simpler way/,
+    /Cost to run/, /The founder\s+decides; then build what the founder chose, fully/, /No market-size tables, no SWOT, no invented numbers/,
+  ]);
+  assert.match(read('claude/skills/brief-to-spec/SKILL.md'), /^12\. Business: target user/m);
+  // Business thinking is a skill and two plan lines, never a department.
+  for (const f of readdirSync(here('claude/agents'))) assert.doesNotMatch(f, /ceo|finance|marketing|sales/i, `${f}: a department agent`);
+});
+
 test('testing grows with the product', () => {
   const t = read('claude/rules/testing.md');
   all(t, [/one saved browser test \(Playwright\) of its\s+main path/,/^## Prototype \(the default\)$/m, /^## Before real users or real data$/m, /Never delete, skip or weaken a test/, /the failing test first/, /clicked through in a real browser/, /80%\+/, /CI on GitHub green/]);
@@ -277,6 +303,6 @@ test('tokens are spent on the product, not on process', () => {
 
 test('handbook stays within its line budget', () => {
   const md = read('claude/CLAUDE.md');
-  assert.ok(md.trimEnd().split(/\r?\n/).length <= 165, 'handbook over 165 lines');
-  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 8600, 'handbook over 8600 bytes');
+  assert.ok(md.trimEnd().split(/\r?\n/).length <= 185, 'handbook over 185 lines');
+  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 9900, 'handbook over 9900 bytes');
 });
