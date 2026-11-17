@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -88,7 +89,8 @@ test('README counts match the files', () => {
   each(/(\d+) staff agents/g, readdirSync(here('claude/agents')).filter((f) => f.endsWith('.md')).length);
   each(
     /(\d+) company skills/g,
-    readdirSync(here('claude/skills')).filter((d) => existsSync(here(`claude/skills/${d}/SKILL.md`)) && !external.has(d)).length,
+    // lessons counts by its starter: its SKILL.md is the founder's own file and is not in the repo.
+    readdirSync(here('claude/skills')).filter((d) => !external.has(d) && ['SKILL.md', 'starter.md'].some((f) => existsSync(here(`claude/skills/${d}/${f}`)))).length,
   );
   each(/(\d+) core plugins?\b/g, plugins.filter((r) => r[2] === 'on').length);
   each(/(\d+) plugins that are off/g, plugins.filter((r) => r[2] === 'off').length);
@@ -214,8 +216,8 @@ test('the lead thinks like a business partner, and the company learns', () => {
     /Minutes, not a\s+report/, /Use the lessons skill when a project starts/,
   ]);
   // Lessons live in a skill: a session can always load a skill, but not a file outside its project folder.
-  all(read('claude/skills/lessons/SKILL.md'), [/^name: lessons$/m, /^description: .*Use in the Study step when a project starts/m, /Verified things only/, /60 lines at\s+most/]);
-  assert.ok(read('claude/skills/lessons/SKILL.md').trimEnd().split(/\r?\n/).length <= 70, 'lessons skill over 70 lines');
+  all(read('claude/skills/lessons/starter.md'), [/^name: lessons$/m, /^description: .*Use in the Study step when a project starts/m, /Verified things only/, /60 lines at\s+most/]);
+  assert.ok(read('claude/skills/lessons/starter.md').trimEnd().split(/\r?\n/).length <= 70, 'lessons skill over 70 lines');
   all(section(md, '2\\. Propose'), [
     /Worth building because: the user, the problem, why they would choose this/,
     /My advice: only when you would build less, build something different, or\s+not build it/, /Say why, plainly\. The founder decides/,
@@ -234,6 +236,35 @@ test('the lead thinks like a business partner, and the company learns', () => {
   assert.match(read('claude/skills/brief-to-spec/SKILL.md'), /^12\. Business: target user/m);
   // Business thinking is a skill and two plan lines, never a department.
   for (const f of readdirSync(here('claude/agents'))) assert.doesNotMatch(f, /ceo|finance|marketing|sales/i, `${f}: a department agent`);
+});
+
+test('the founder\'s own lessons never leave the laptop', () => {
+  const own = 'claude/skills/lessons/SKILL.md';
+  assert.equal(execFileSync('git', ['ls-files', '--', own], { cwd: here('.'), encoding: 'utf8' }).trim(), '', `${own} is tracked again`);
+  assert.match(read('.gitignore'), /^claude\/skills\/lessons\/SKILL\.md$/m);
+  // update.sh creates the own file from the starter once and never overwrites it.
+  assert.ok(read('update.sh').includes('[ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/starter.md" "$LESSONS/SKILL.md"'), 'update.sh does not create the lessons file');
+  assert.match(read('check.mjs'), /'skills', 'lessons', 'SKILL\.md'/);
+  const starter = read('claude/skills/lessons/starter.md');
+  assert.match(starter, /git ignores it, so what you\s+write never leaves this laptop/);
+  assert.doesNotMatch(starter, /\b20\d\d-\d\d-\d\d\b/, 'the starter carries a dated note from one founder');
+});
+
+test('anyone may use the kit', () => {
+  all(read('LICENSE'), [/^MIT License$/m, /Permission is hereby granted, free of charge, to any person/]);
+  all(read('README.md'), [/^## Who it is for$/m, /^## What you need$/m, /^## What it costs$/m, /\[LICENSE\]\(LICENSE\)/]);
+  assert.doesNotMatch(read('README.md'), /My personal/);
+  // A stranger must be able to read what the installer changes on the machine before running it.
+  all(section(read('README.md'), 'What you need'), [
+    /Homebrew if it is missing/, /renamed to `<name>\.backup`/, /copied to `CLAUDE\.md\.backup` once/, /on every `bash update\.sh`/,
+    /a repo's own `\.git\/hooks` no longer run/, /removes Claude co-author/, /`gh auth setup-git`/, /`gh auth login`/,
+    /git config --global --unset core\.hooksPath/, /every plugin in `plugins\.txt`/, /`~\/\.claude\/vendor`/,
+  ]);
+  assert.ok(
+    read('install-windows.bat').includes('if not exist "%USERPROFILE%\\.claude\\CLAUDE.md.backup" copy "%USERPROFILE%\\.claude\\CLAUDE.md" "%USERPROFILE%\\.claude\\CLAUDE.md.backup"'),
+    'the Windows installer overwrites an existing handbook without a backup',
+  );
+  assert.doesNotMatch(section(read('claude/CLAUDE.md'), 'Who you work for'), /AI technologist/i);
 });
 
 test('the founder can always go back, and reports are in plain words', () => {

@@ -4,7 +4,16 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-17
+
+### Added
+- MIT licence (`LICENSE`): anyone may use, copy and change the kit
+- Your own lessons stay on your laptop: the repo ships `claude/skills/lessons/starter.md`, `update.sh` creates `claude/skills/lessons/SKILL.md` from it once and never overwrites it, git ignores that file, and `check.mjs` reports when it is missing
+- README: who the kit is for, what it needs, what the installer changes on your machine and what a task cost in the benchmark
+- The Windows installer keeps one copy (`CLAUDE.md.backup`) of a handbook that was in `~/.claude` before the first install
+
 ### Changed
+- The handbook no longer describes one person, and `docs/STATUS.md` holds the current state only
 - Assistant workflow: every order runs in five steps (study, propose one short plan, build, check itself, show). The lead studies the product instead of interviewing the founder, the founder says yes once, and the lead builds with the skills the task needs: a design skill for every screen, backend and security standards for server code
 - Security and testing rules stay always on and apply from the first line of a prototype; testing grows with the product; scale rules apply only when the spec says the product needs them
 - Only caveman stays a core plugin; ecc, superpowers, claude-mem and ponytail are installed but off (a new session loaded about 76,000 tokens with five plugins on)
@@ -20,6 +29,8 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ### Removed
 - founder-proxy, the tiers (Tiny, Normal, Risky), the founder gates and the chain of planner, approver, builder and reviewers per feature
+- `docs/PLAN.md`, the plan for 1.3.0
+- `claude/skills/lessons/SKILL.md` as a file in the repo. No release had it: it was on main only, between 1.3.0 and 2.0.0. A laptop that pulled main in that time: the pull removes the file and `bash update.sh` creates a new one from the starter; get the old lessons back with `git show 9ecebc4:claude/skills/lessons/SKILL.md`. If the file has changes that were never committed, the pull stops: save a copy, run `git checkout -- claude/skills/lessons/SKILL.md`, run `bash update.sh`, then put your copy back. If you committed your own changes to it, the pull also stops: save a copy, run `git reset --hard origin/main` (this drops every local commit on main and every change to a tracked file that was not committed), run `bash update.sh`, then put your copy back
 
 ## [1.3.0] - 2026-11-16
 

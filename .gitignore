@@ -2,6 +2,7 @@ claude/skills/synced/
 claude/skills/.trash/
 .DS_Store
 claude/skills/myoffice/
+claude/skills/lessons/SKILL.md
 .playwright-mcp/
 .env
 .env.*

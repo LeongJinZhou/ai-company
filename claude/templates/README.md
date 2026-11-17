@@ -31,4 +31,4 @@ git clone ... && npm install && npm run dev
 - [ ] ...
 
 ## Author
-**Your Name**, AI Technologist · [GitHub](https://github.com/USER)
+**Your Name**, Your Role · [GitHub](https://github.com/USER)
