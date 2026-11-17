@@ -2,8 +2,12 @@
 
 [![ci](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml/badge.svg)](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml)
 
-My personal AI assistant for Claude Code, built like a small software company.
-I give a topic and a few rough points. It studies the product, shows me one short plan, and after my yes it builds, checks its own work and shows me the result.
+An AI assistant for Claude Code, built like a small software company. You are the founder.
+You give a topic and a few rough points. It studies the product, shows you one short plan, and after your yes it builds, checks its own work and shows you the result.
+
+## Who it is for
+
+One person who builds software products with Claude Code and wants results to look at, not a process to manage: a solo founder, a freelancer, a small team with one decision maker. It is a working method (a handbook, rules, staff agents and skills), not an app. It is not for teams that need several people to approve a change.
 
 ## How it works
 
@@ -35,7 +39,7 @@ flowchart TD
     G --> P["Production, on the founder's word:<br>full sweep of the whole product<br>before real users or real data"]
 ```
 
-The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, `claude/skills/lessons/SKILL.md`, read when a project starts.
+The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, `claude/skills/lessons/SKILL.md`, read when a project starts. That file is yours: `update.sh` creates it once from `claude/skills/lessons/starter.md`, and git ignores it, so your notes never leave your laptop. It lives inside your clone of this repo: keep a copy before you delete or re-clone that folder.
 
 There are two modes. Building (steps 1 to 5) is the default and checks each change: the builder never has the last word, a code-reviewer reads every code change, and new screens and risky changes get their own reviewer. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
 
@@ -48,7 +52,7 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 | `claude/CLAUDE.md` | The handbook every session reads first |
 | `claude/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
 | `claude/agents/` | 13 staff agents |
-| `claude/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects) |
+| `claude/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects; the repo holds a starter, your own copy is never committed) |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
 | `plugins.txt` | Every plugin, and whether it is on or off |
@@ -57,13 +61,34 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 | `.claude-plugin/marketplace.json` | This repo as a plugin marketplace (the blast-radius plugin) |
 | `update.sh`, `check.mjs` | Update everything to latest, then verify |
 | `office-proxy.mjs`, `office-remote.cmd` | Private phone access to the office page |
-| `docs/STATUS.md`, `docs/PLAN.md` | Project state and the current plan |
+| `docs/STATUS.md` | Project state: done, decisions, benchmark, open issues |
 | `CHANGELOG.md` | What changed, one line per change |
+| `LICENSE` | MIT: use it, copy it, change it |
 
-## New laptop
+## What you need
+
+- Claude Code with a paid Claude plan or an API key.
+- Windows or Mac.
+- The models the company names. The lead runs on opus. Each staff agent names its own model in the `model:` line of its file in `claude/agents/`: most review on opus and build on sonnet, the architect uses fable and the site monitor haiku. If your plan lacks one, change that line.
+
+The installer changes your machine. Read `install-windows.bat` or `install-mac.command` before you run it. What it does:
+
+- Programs: it installs Claude Code if it is missing, and Node, Git, GitHub CLI, gitleaks, semgrep, osv-scanner, bun and ccusage. On Windows also Python. On Mac also Homebrew if it is missing: its install script is downloaded and run.
+- `~/.claude`: `rules`, `agents`, `skills` and `templates` become links into this repo. A folder that is already there is renamed to `<name>.backup` first.
+- The handbook goes to `~/.claude/CLAUDE.md`. On Mac a file that is already there is renamed to `CLAUDE.md.backup`. On Windows it is copied to `CLAUDE.md.backup` once, and then replaced at install and on every `bash update.sh`.
+- Git, for every repo on the machine: the global hooks path is set to `claude/git-hooks`, so a repo's own `.git/hooks` no longer run unless that repo sets its own hooks path. The `commit-msg` hook removes Claude co-author and "Generated with Claude Code" lines from every commit message; the `pre-commit` hook runs gitleaks. The default branch name becomes `main`, and GitHub CLI becomes git's sign-in helper for GitHub (`gh auth setup-git`). To undo the hooks: `git config --global --unset core.hooksPath`.
+- GitHub CLI asks you to sign in (`gh auth login`) if you are not signed in.
+- Claude Code: the Playwright MCP server, every plugin in `plugins.txt`, the built-in plugin `cc-plugin-you-should-know`, the 4 reference repos of `refs.txt` in `~/.claude/vendor`, and the myoffice skill from the repo named in `skills.txt`.
+
+## What it costs
+
+You pay for tokens through your Claude plan or API key; the kit itself is free. Measured on 2026-11-17 on small test projects with an opus lead, at API prices, one run each: a small task cost $1.21 to $1.93, a task with a new screen $3.78, and a production sweep of a small library $1.86. Your numbers will differ. The table is in `docs/STATUS.md`.
+
+## Install
 
 1. Install Git, then clone this repo into your home folder:
    `git clone https://github.com/LeongJinZhou/ai-company` (the repo is public; no sign-in is needed to clone it).
+   To change the company for yourself, fork it first and clone your fork.
 2. Double-click `install-windows.bat` (Windows) or `install-mac.command` (Mac).
 3. Merge `claude/settings-additions.json` into `~/.claude/settings.json`. The file sets the lead model (`opus`), turns ECC GateGuard off, clears commit and PR attribution, and sets the ccusage status line. GateGuard is ECC's check-before-edit gate; the blast-radius plugin is the preview for risky shell commands.
 4. Restart Claude Code.
@@ -111,7 +136,7 @@ Plugins run their own hooks and code on your machine. Only add ones you trust.
 
 ## Changing the company
 
-Edit files here and open a pull request. It is squash-merged, and
+In your own fork: edit files and open a pull request. It is squash-merged, and
 `CHANGELOG.md` records each change. Other laptops get it with `bash update.sh`.
 `node --test` runs the tests; CI runs them on every push.
 
@@ -147,5 +172,9 @@ now. Never use `tailscale funnel` for this: that would make the page public.
 
 ## Security notes
 
-- This repo is public. It holds the working method only: rules, agents, skills and the installer. Project code stays in its own private repos.
+- This repo is public. It holds the working method only: rules, agents, skills and the installer. Project code stays in its own private repos, and your own lessons file stays on your laptop.
 - No secrets, .env files or real data go in this repo. The `pre-commit` hook in `claude/git-hooks/` runs gitleaks on staged changes and blocks the commit if it finds a secret. It does nothing if gitleaks is not installed. It needs gitleaks 8.19 or newer; the installers install gitleaks.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). The plugins, the reference repos and the myoffice skill are fetched from their own repos when you install, and each keeps its own licence.

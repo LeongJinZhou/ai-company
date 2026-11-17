@@ -28,6 +28,11 @@ fi
 # them. On Windows CLAUDE.md is a copy, not a link, and must be refreshed.
 [ -L "$DEST/CLAUDE.md" ] || cp "$KIT/claude/CLAUDE.md" "$DEST/CLAUDE.md"
 
+# Your own lessons: created once from the starter, never overwritten. Git
+# ignores the file, so what you write in it stays on this laptop.
+LESSONS="$KIT/claude/skills/lessons"
+[ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/starter.md" "$LESSONS/SKILL.md"
+
 # Failures in the loops below are not fatal on their own ("already added",
 # "already disabled" are normal). check.mjs at the end decides pass/fail.
 rows() { grep -vE '^\s*(#|$)' "$1"; }

@@ -17,6 +17,8 @@ for %%i in (rules agents skills templates) do (
   if exist "%USERPROFILE%\.claude\%%i" ren "%USERPROFILE%\.claude\%%i" "%%i.backup"
   mklink /J "%USERPROFILE%\.claude\%%i" "%CD%\claude\%%i"
 )
+REM Keep one copy of a handbook that was there before the first install.
+if exist "%USERPROFILE%\.claude\CLAUDE.md" if not exist "%USERPROFILE%\.claude\CLAUDE.md.backup" copy "%USERPROFILE%\.claude\CLAUDE.md" "%USERPROFILE%\.claude\CLAUDE.md.backup"
 copy /Y "claude\CLAUDE.md" "%USERPROFILE%\.claude\CLAUDE.md"
 git config --global core.hooksPath "%CD:\=/%/claude/git-hooks"
 git config --global init.defaultBranch main

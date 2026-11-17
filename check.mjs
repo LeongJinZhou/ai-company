@@ -38,6 +38,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const [repo, name] of rows('skills.txt')) {
     if (!existsSync(join(dest, 'skills', name, 'SKILL.md'))) bad.push(`${repo}: skill ${name} missing`);
   }
+  if (!existsSync(join(dest, 'skills', 'lessons', 'SKILL.md'))) {
+    bad.push('lessons: your own lessons file is missing; run bash update.sh');
+  }
   for (const name of readdirSync(join(kit, 'claude', 'agents'))) {
     if (!existsSync(join(dest, 'agents', name))) bad.push(`agents/${name}: not linked into ${dest}`);
   }
