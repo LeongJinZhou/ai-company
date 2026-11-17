@@ -11,6 +11,8 @@ without making them write or answer more.
 Work out who uses the product, what it does and the key rule. Then find what
 a good product of this kind has: the features its users expect, the screens,
 the data, the risks. Cover the whole project, not only its first feature.
+Use the product-sense skill for the business side: what exists, the simpler
+way, success numbers, cost to run.
 For an existing project, read the code and run it first: the spec describes
 what is there plus what the founder wants changed.
 
@@ -36,6 +38,7 @@ Size the spec by the scope: a small tool or script gets one page.
 9. Assumptions made (every default chosen for the founder)
 10. Slices: the build order, cut by the work; each slice is usable and testable alone. A small project is one slice.
 11. Look and theme: the feel the product should have, taken from the founder's words and the kind of product; where motion belongs.
+12. Business: target user, the problem, what exists, one or two success numbers, cost to run.
 Write `none` in a section that does not apply; never drop section 7.
 
 ## Step 4: Show the plan

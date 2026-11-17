@@ -13,6 +13,8 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 - A change to a permission check or a database query now also goes to security-reviewer. The benchmark of 2026-11-17 showed that such a change (order 3) was checked only by the lead itself
 - Two modes. Building checks each change with independent reviewers: tools first, a new code-reviewer agent on every code change, ux-reviewer on every new screen, architect on the data model of a new project with a database or login, one saved browser test per feature. Production is the full sweep of the whole product on the founder's word "production", before real users or real data
 - The skill map points a bug that survived one fix to the systematic-debugging skill file on disk, with the plugin off
+- Business thinking: a new product-sense skill (who it is for, what exists, the simpler way, success numbers, cost to run), read only for a new product or large feature; the plan says why the product is worth building and gives plain advice when the lead would build less or something different
+- The company learns: the lessons skill holds verified lessons across all projects (a skill, because a session cannot read a file outside its project folder), and the lead proposes one rule change when the founder corrects the same kind of thing twice
 
 ### Removed
 - founder-proxy, the tiers (Tiny, Normal, Risky), the founder gates and the chain of planner, approver, builder and reviewers per feature
