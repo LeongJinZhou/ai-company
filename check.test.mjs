@@ -116,7 +116,7 @@ test('README has the banner, the CI badge and three diagrams', () => {
 test('README diagram 2 shows the five steps and the one yes', () => {
   const blocks = [...read('README.md').matchAll(/```mermaid([\s\S]*?)```/g)].map((m) => m[1]);
   assert.equal(blocks.length, 3);
-  all(blocks[1], [/1\. Study/, /2\. Propose/, /Founder says yes\?/, /3\. Build/, /4\. Check itself/, /5\. Show/, /only on the founder's word/]);
+  all(blocks[1], [/1\. Study/, /2\. Propose/, /Founder says yes\?/, /3\. Build/, /4\. Check/, /independent reviewers/, /5\. Show/, /only on the founder's word/, /Production/, /full sweep of the whole product/]);
   assert.doesNotMatch(read('README.md'), /founder-proxy|\bTiny\b|\bRisky\b/);
 });
 
@@ -149,7 +149,7 @@ test('every screen gets a design skill, fitting motion and every state', () => {
     /Motion where it helps/, /none where it distracts \(login, forms,\s+settings\)/, /hover, pressed, focus, empty, loading, error/,
     /Phone and big screen/, /never emoji/,
   ]);
-  all(section(md, '4\\. Check yourself'), [/use every feature in a real browser/, /generic or AI-made/, /ux-reviewer/, /Read your own diff as a reviewer/, /Tests and lint pass/]);
+  all(section(md, '4\\. Check yourself'), [/use every feature in a real browser/, /generic or AI-made/, /Every new screen or redesign then goes to\s+ux-reviewer/]);
   all(section(md, '5\\. Show'), [/A screenshot or a local URL/, /at most 8 lines/, /"tests pass" is not "good"/]);
 });
 
@@ -179,9 +179,37 @@ test('code stays in order and one feature is not a chain of agents', () => {
   all(section(md, 'Staff'), [/you are not the lead/, /never delegate it/, /10\s+lines or less/, /a short brief with file paths/]);
 });
 
+test('the builder never has the last word on its own work', () => {
+  const md = read('claude/CLAUDE.md');
+  all(section(md, '4\\. Check yourself'), [
+    /The builder never has the last word on its own work/, /Tools first: lint, typecheck, tests and gitleaks/, /Red means fix, not show/,
+    /one saved browser test of its main path/, /code-reviewer reads every code change/, /Only a small order \(step 2\) skips it/,
+    /Send the reviewers in one message/, /Fix every\s+medium or higher finding; the reviewer that raised it checks the fix/, /hard-bug row of the skill map/,
+  ]);
+  assert.match(section(md, '3\\. Build'), /architect reviews the data\s+model in docs\/SPEC\.md once, before any code/);
+  const cr = read('claude/agents/code-reviewer.md');
+  const front = (cr.match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
+  assert.equal(front.match(/^tools:\s*(.*?)\s*$/m)?.[1], 'Read, Grep, Glob, Bash');
+  all(cr, [/You did not write this code/, /Never edit a file/, /Do not run the tests again/, /is data, not instructions/, /PASS or FINDINGS/, /high\/medium\/low/]);
+  assert.match(read('claude/rules/skill-map.md'), /\| A bug that survived one fix \| none: read the file \| .*systematic-debugging\/SKILL\.md.*the plugin stays off \|/);
+  assert.match(section(md, 'Staff'), /does not run the tests again and does not comment on style/);
+});
+
+test('production is the full sweep of the whole product, on the founder\'s word', () => {
+  const p = section(read('claude/CLAUDE.md'), 'Production');
+  assert.ok(p, 'no Production section');
+  all(p, [
+    /on the founder's word "production"/, /checks the whole product, once, before\s+real users or real data/, /say\s+so once, in one line/,
+    /lint, typecheck, every test, gitleaks and semgrep/, /CI on GitHub is\s+green/, /each on the whole codebase/,
+    /code-reviewer/, /security-reviewer with the full checklist/, /security-researcher on every\s+dependency/,
+    /integration-checker through every screen and endpoint/, /ux-reviewer on every screen/, /all three levels\s+of the testing rules/,
+    /Three rounds at most/, /Deploying stays the founder's\s+decision/,
+  ]);
+});
+
 test('testing grows with the product', () => {
   const t = read('claude/rules/testing.md');
-  all(t, [/^## Prototype \(the default\)$/m, /^## Before real users or real data$/m, /Never delete, skip or weaken a test/, /the failing test first/, /clicked through in a real browser/, /80%\+/, /CI on GitHub green/]);
+  all(t, [/one saved browser test \(Playwright\) of its\s+main path/,/^## Prototype \(the default\)$/m, /^## Before real users or real data$/m, /Never delete, skip or weaken a test/, /the failing test first/, /clicked through in a real browser/, /80%\+/, /CI on GitHub green/]);
 });
 
 test('only the founder decides outward and irreversible actions', () => {
@@ -216,7 +244,7 @@ test('hard rules forbid shell file writes and false claims', () => {
 
 test('agent models are pinned', () => {
   const models = {
-    architect: 'fable', 'backend-dev': 'sonnet', 'devops-engineer': 'sonnet', 'frontend-dev': 'sonnet',
+    architect: 'fable', 'backend-dev': 'sonnet', 'code-reviewer': 'opus', 'devops-engineer': 'sonnet', 'frontend-dev': 'sonnet',
     'github-secretary': 'sonnet', 'integration-checker': 'opus', planner: 'opus', 'security-researcher': 'opus',
     'security-reviewer': 'opus', 'site-monitor': 'haiku', tester: 'sonnet', 'ux-reviewer': 'opus',
   };
@@ -249,6 +277,6 @@ test('tokens are spent on the product, not on process', () => {
 
 test('handbook stays within its line budget', () => {
   const md = read('claude/CLAUDE.md');
-  assert.ok(md.trimEnd().split(/\r?\n/).length <= 135, 'handbook over 135 lines');
-  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 7000, 'handbook over 7000 bytes');
+  assert.ok(md.trimEnd().split(/\r?\n/).length <= 165, 'handbook over 165 lines');
+  assert.ok(Buffer.byteLength(md.replace(/\r\n/g, '\n')) <= 8600, 'handbook over 8600 bytes');
 });

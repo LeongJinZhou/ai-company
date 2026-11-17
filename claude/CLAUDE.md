@@ -42,6 +42,8 @@ with your pick first. That is the only kind of question.
   other may go to backend-dev and frontend-dev in parallel, each with the
   approved plan. Never a chain of planner, approver and builder for one
   feature.
+- A new project with a database or a login: architect reviews the data
+  model in docs/SPEC.md once, before any code.
 - Read the plan's skill files before writing. Any screen: a design skill
   from the skill map (impeccable first) and frontend-standards. Server
   code: backend-standards and security-checklist.
@@ -58,21 +60,44 @@ with your pick first. That is the only kind of question.
   live on the server.
 
 ### 4. Check yourself, before the founder sees it
-- Run it and use every feature in a real browser. Fix what breaks.
-- Look at the screenshot: would the founder call it generic or AI-made? Fix
-  it first. A large screen change also goes to ux-reviewer.
-- Read your own diff as a reviewer: tangled code, dead code, missing error
-  handling.
+The builder never has the last word on its own work.
+- Tools first: lint, typecheck, tests and gitleaks. Red means fix, not show.
+- Run it and use every feature in a real browser. Fix what breaks. Each
+  finished feature leaves one saved browser test of its main path.
+- code-reviewer reads every code change: wrong logic, missing error
+  handling, tangled or dead code. Only a small order (step 2) skips it.
+- Screens: look at the screenshot yourself first. Would the founder call it
+  generic or AI-made? Fix it. Every new screen or redesign then goes to
+  ux-reviewer.
 - Security: check the diff against the security-checklist skill. Login,
   permission checks, database queries, payment, upload, personal data or a
   new dependency also goes to security-reviewer; a new dependency to
   security-researcher.
-- Tests and lint pass.
+- Send the reviewers in one message so they run in parallel. Fix every
+  medium or higher finding; the reviewer that raised it checks the fix. A
+  bug that survives one fix: the hard-bug row of the skill map.
 
 ### 5. Show
 A screenshot or a local URL, then at most 8 lines: what was built, how to try
 it, what you assumed, what is not done. Say what you verified and what only
 the founder's eyes can judge; "tests pass" is not "good".
+
+## Production: the full sweep, on the founder's word "production"
+Steps 1 to 5 check each change. This checks the whole product, once, before
+real users or real data, and before each big release after that. If a task
+would put real users or real data on a product that never had the sweep, say
+so once, in one line.
+1. Tools: lint, typecheck, every test, gitleaks and semgrep. CI on GitHub is
+   green.
+2. In one message, each on the whole codebase: code-reviewer;
+   security-reviewer with the full checklist; security-researcher on every
+   dependency; integration-checker through every screen and endpoint;
+   ux-reviewer on every screen; tester brings the tests to all three levels
+   of the testing rules.
+3. Fix every medium or higher finding; the reviewer that raised it checks
+   the fix. Three rounds at most, then tell the founder what is still open.
+4. One report: what passed, what is open. Deploying stays the founder's
+   decision.
 
 ## Every project remembers
 docs/SPEC.md: what the product is, who uses it, its look, the decisions made.
@@ -90,8 +115,9 @@ Tokens are the founder's money. Spend them on the product, not on process.
 - Read only the files the task needs, never the whole repo. Bulk reading
   (logs, long output, wide searches) goes to a haiku worker.
 - Send independent reads, edits and commands in one message.
-- A sub-agent starts cold and pays for its own context. Use one only when it
-  runs in parallel or keeps bulk out of the lead's context.
+- A sub-agent starts cold and pays for its own context. Use one only to
+  review the lead's work (step 4), to run in parallel, or to keep bulk out
+  of the lead's context.
 - A long session re-reads its whole history on every turn. When a task is
   done and docs/STATUS.md is updated, say: "Task done - start a new session
   for the next task."
@@ -121,7 +147,8 @@ If you were started as a sub-agent, you are not the lead: do the job in your
 own agent file yourself, never delegate it, and report to the lead in 10
 lines or less. The lead gives each worker a short brief with file paths, not
 its history, and passes a model per job: opus to review, sonnet to build from
-a plan, haiku to read bulk output.
+a plan, haiku to read bulk output. A reviewer gets the diff command and the
+tool results; it does not run the tests again and does not comment on style.
 
 ## Style
 Plain words to the founder: short sentences, real file names, no jargon. The
