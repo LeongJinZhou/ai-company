@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { lessonsProblems, linkProblems, problems, rows, runs, settingsProblems, toolProblems, tools } from './check.mjs';
+import { commitsBehind, lessonsProblems, linkProblems, problems, rows, runs, settingsProblems, toolProblems, tools } from './check.mjs';
 
 const here = (p) => join(import.meta.dirname, p);
 const read = (p) => readFileSync(here(p), 'utf8');
@@ -134,6 +134,103 @@ test('every laptop gets the same settings, connections and tools as the first on
     /A key you delete is added again on the next update/, /the Sentry MCP server/, /claude mcp remove sentry -s user/,
   ]);
   assert.doesNotMatch(section(read('README.md'), 'Install'), /Merge `claude\/settings-additions\.json`/);
+});
+
+test('the check knows when this copy is behind GitHub', () => {
+  const asked = [];
+  const git = (answer) => (args) => { asked.push(args); if (answer instanceof Error) throw answer; return answer; };
+  assert.equal(commitsBehind(git('3\n')), 3);
+  assert.deepEqual(asked, ['fetch --quiet', 'rev-list --count HEAD..@{u}']);
+  assert.equal(commitsBehind(git('0\n')), 0);
+  // A branch that follows nothing: unknown is not a failure.
+  assert.equal(commitsBehind(git(new Error('fatal: no upstream configured'))), 0);
+  assert.equal(commitsBehind(git('')), 0);
+  // No network: the fetch fails, but what the last fetch learned still counts.
+  assert.equal(commitsBehind((args) => { if (args.startsWith('fetch')) throw new Error('could not resolve host'); return '4\n'; }), 4);
+  all(read('check.mjs'), [/const behind = commitsBehind\(/, /if \(behind\) bad\.push\(/]);
+});
+
+// The handbook is the source. Agents, skills and templates must not send a worker to a file
+// that nothing writes, or force a design the handbook leaves to the spec.
+test('agents, skills and templates agree with the handbook', () => {
+  const claude = (folder) => readdirSync(here(`claude/${folder}`), { recursive: true })
+    .map((f) => `claude/${folder}/${String(f).replaceAll('\\', '/')}`)
+    .filter((f) => /\.(md|yml)$/.test(f) && !f.startsWith('claude/skills/myoffice/') && !f.startsWith('claude/skills/synced/') && !f.startsWith('claude/skills/.trash/') && f !== 'claude/skills/lessons/SKILL.md');
+  const files = ['agents', 'rules', 'skills', 'templates'].flatMap(claude);
+  assert.ok(files.length > 25, `only ${files.length} files found`);
+  // Every project has SPEC.md and STATUS.md. The other docs exist only when their writer ran.
+  const writer = { 'ARCHITECTURE.md': 'claude/agents/architect.md', 'API.md': 'claude/agents/architect.md', 'PLAN.md': 'claude/agents/planner.md', 'RELEASE.md': 'claude/agents/devops-engineer.md' };
+  for (const file of files) {
+    const text = read(file);
+    for (const [, name] of text.matchAll(/docs\/([A-Z]+\.md)/g)) {
+      if (name === 'SPEC.md' || name === 'STATUS.md') continue;
+      assert.ok(writer[name], `${file} names docs/${name}, which nothing writes`);
+    }
+    // Outside its writer, such a doc may only be named as something a project may have.
+    // The planner is the one exception: it runs on a large project, after the architect.
+    const lines = text.split(/\r?\n/);
+    for (const [i, line] of lines.entries()) {
+      for (const [, name] of line.matchAll(/\b(ARCHITECTURE|API|PLAN|RELEASE)\.md/g)) {
+        if (file === writer[`${name}.md`] || file === 'claude/agents/planner.md') continue;
+        const context = `${lines[i - 1] || ''} ${line} ${lines[i + 1] || ''}`;
+        assert.match(context, /when the\s+project has|Only when the project has/i, `${file} names ${name}.md as if every project had it`);
+      }
+    }
+  }
+  // The architect's first job is the one the handbook names; the rest only on the lead's word.
+  assert.match(section(read('claude/CLAUDE.md'), '3\\. Build'), /architect reviews the data\s+model in docs\/SPEC\.md once, before any code/);
+  all(read('claude/agents/architect.md'), [/^description: Reviews the data model of an approved docs\/SPEC\.md before any code/m, /1\. Always: review the data model in docs\/SPEC\.md before any code/, /Jobs 2 to 4 only when the lead's brief asks for them/]);
+  // Builders that work in parallel need a contract: docs/API.md, or the endpoints in the brief.
+  for (const agent of ['backend-dev', 'frontend-dev']) {
+    all(read(`claude/agents/${agent}.md`), [/when\s+the project has a docs\/API\.md, follow it exactly/, /the brief\s+must name each endpoint/, /stop and\s+report that, do not guess/]);
+  }
+  // site-monitor is a small model: it reports, the lead writes the project's memory.
+  const monitor = read('claude/agents/site-monitor.md');
+  all(monitor, [/^disallowedTools: Edit, Write, NotebookEdit$/m, /Write no file: the lead adds each real bug to the open\s+list in docs\/STATUS\.md/]);
+
+  // Several organisations is a decision of the spec (handbook, Scale), never a default.
+  assert.match(read('claude/rules/security.md'), /scoped to its owner: the user, group or\s+organisation it belongs to/);
+  assert.match(read('claude/agents/architect.md'), /organisation_id on tables only when docs\/SPEC\.md says the product\s+serves several organisations/);
+  assert.match(read('claude/skills/backend-standards/SKILL.md'), /background jobs when a\s+measurement or docs\/SPEC\.md calls for it/);
+});
+
+test('the project templates name one stack and keep the project\'s memory in git', (t) => {
+  const stackOf = (file) => section(read(file), 'Tech stack');
+  const project = stackOf('claude/templates/project-CLAUDE.md');
+  const readme = stackOf('claude/templates/README.md');
+  assert.ok(project && readme, 'a template has no Tech stack section');
+  for (const part of ['React', 'Next.js', 'PHP', 'MySQL', 'PostgreSQL', 'Prisma', 'Playwright']) {
+    assert.equal(readme.includes(part), project.includes(part), `the README template and the project CLAUDE.md template disagree on ${part}`);
+  }
+  // Every test runner the stack names runs in the CI template.
+  const ci = read('claude/templates/ci.yml');
+  for (const [runner, step] of [['Vitest', /npm test/], ['PHPUnit', /vendor\/bin\/phpunit/], ['Playwright', /npm run test:e2e/]]) {
+    if (project.includes(runner)) assert.match(ci, step, `the CI template never runs ${runner}`);
+  }
+  // Least rights for the CI token; the gitleaks step needs to list a pull request's commits.
+  assert.match(ci, /^permissions:\r?\n  contents: read\r?\n  pull-requests: read\b/m);
+  for (const [, ref] of ci.matchAll(/uses: \S+@(\S+)/g)) assert.match(ref, /^[0-9a-f]{40}$/, `a CI template action is not pinned to a commit: ${ref}`);
+  assert.doesNotMatch(read('claude/templates/project-CLAUDE.md'), /local only/);
+
+  // The gitignore template, tried with real git: memory and migrations go in, dumps stay out.
+  const dir = mkdtempSync(join(tmpdir(), 'kit-ignore-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  execFileSync('git', ['init', '-q', dir]);
+  writeFileSync(join(dir, '.gitignore'), read('claude/templates/gitignore'));
+  const ignored = (path) => {
+    try {
+      execFileSync('git', ['-C', dir, 'check-ignore', '-q', path], { stdio: 'ignore' });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  for (const path of ['docs/STATUS.md', 'docs/SPEC.md', 'backend/migrations/0001_initial_schema.sql', 'api/migrations/down/0001.sql', 'migrations/0001.sql', 'api/tests/fixtures/users/seed.sql', '.env.example']) {
+    assert.equal(ignored(path), false, `${path} would never reach git`);
+  }
+  for (const path of ['dump.sql', 'backup/prod.sql', 'export.csv', 'data.dump', '.env', '.env.local', 'node_modules/x.js', 'backend/vendor/autoload.php']) {
+    assert.equal(ignored(path), true, `${path} would be committed`);
+  }
 });
 
 test('README counts match the files', () => {

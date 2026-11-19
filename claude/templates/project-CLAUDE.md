@@ -4,6 +4,8 @@
 <2-3 sentences: who uses it and what it does. Filled from SPEC.md.>
 
 ## Tech stack
+The default. Change these lines when docs/SPEC.md names another stack; the
+README and .github/workflows/ci.yml must then say the same.
 - Frontend: React + TypeScript
 - Backend: PHP 8+ (PSR-12), parameterised PDO
 - Database: MySQL
@@ -24,5 +26,6 @@ The lead reads these before building and hands the paths to any worker. Add a ro
 | <UI look and feel> | <impeccable> | <full path to SKILL.md#Heading> | <frontend-dev, ux-reviewer> |
 
 ## Key docs
-docs/SPEC.md · docs/ARCHITECTURE.md · docs/API.md · docs/PLAN.md ·
-docs/STATUS.md (local only) · docs/RELEASE.md
+docs/SPEC.md · docs/STATUS.md (both in git: they are the project's memory).
+Only when the project has them: docs/ARCHITECTURE.md · docs/API.md ·
+docs/PLAN.md · docs/RELEASE.md

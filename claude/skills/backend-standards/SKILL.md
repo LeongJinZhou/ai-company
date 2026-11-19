@@ -5,7 +5,7 @@ description: Backend architecture, logic, testing and performance standards. Use
 Structure
 - Route -> validation -> service (business rules) -> data access.
   Business logic never lives in route handlers or the UI.
-- Follow docs/API.md exactly. One error shape:
+- Follow docs/API.md exactly when the project has one. One error shape:
   { error: { code, message } } with correct HTTP status codes.
 Data
 - Schema changes only through migrations.
@@ -20,7 +20,8 @@ Testing
 - 80%+ coverage on services; no padding tests.
 Performance
 - Paginate lists. No N+1 queries. Select only needed columns.
-- Cache read-heavy data. Heavy work runs as background jobs.
+- Cache read-heavy data and move heavy work to background jobs when a
+  measurement or docs/SPEC.md calls for it, not before.
 Other
 - No magic numbers: rules like "30 minutes" live in settings.
 - Times in UTC from the server clock. Repeatable actions idempotent.

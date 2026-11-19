@@ -19,7 +19,8 @@ skip a rule that does apply.
   build SQL by joining strings.
 - Validate every request body, query and param on the server with a
   schema (e.g. zod). Reject unknown fields.
-- Every query on owned data is scoped by organisation and user.
+- Every query on owned data is scoped to its owner: the user, group or
+  organisation it belongs to.
 - No raw HTML from users.
 
 ## Auth and sessions

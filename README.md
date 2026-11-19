@@ -94,7 +94,7 @@ You pay for tokens through your Claude plan or API key; the kit itself is free. 
 2. Double-click `install-windows.bat` (Windows) or `install-mac.command` (Mac).
 3. Restart Claude Code.
 
-The installer prints `OK: ...` when the laptop matches the repo: plugins, reference repos, skills, agents, rules, handbook, settings, the browser connection and the tools. Every laptop that prints `OK` has the same company. The one thing no install can set is the model you pick: in the desktop app the model picker overrides the `opus` setting, so choose the model there for each new session.
+The installer prints `OK: ...` when the laptop matches the repo: plugins, reference repos, skills, agents, rules, handbook, settings, the browser connection and the tools, and when this copy is not behind GitHub. Every laptop that prints `OK` has the same company. The one thing no install can set is the model you pick: in the desktop app the model picker overrides the `opus` setting, so choose the model there for each new session.
 
 ## Update (any laptop, any time)
 

@@ -63,6 +63,21 @@ export function lessonsProblems(folder) {
 export const toolProblems = (names, works) =>
   names.filter((name) => !works(`${name} --version`)).map((name) => `${name}: not installed; run the installer again`);
 
+// How many commits this copy of the kit is behind its branch on GitHub. 0 when that cannot
+// be known: no network, or a branch that follows nothing. `git` runs one git command in the kit folder.
+export function commitsBehind(git) {
+  try {
+    git('fetch --quiet');
+  } catch {
+    // No network: what the last fetch learned still counts.
+  }
+  try {
+    return Number(git('rev-list --count HEAD..@{u}')) || 0;
+  } catch {
+    return 0;
+  }
+}
+
 export const rows = (file) =>
   readFileSync(join(kit, file), 'utf8')
     .split('\n')
@@ -105,6 +120,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     bad.push('playwright: browser connection missing; run: claude mcp add --scope user playwright npx @playwright/mcp@latest');
   }
   bad.push(...toolProblems(tools, runs));
+  // A pull that failed leaves an old company in place; without this line the check would still say OK.
+  const behind = commitsBehind((args) => execSync(`git ${args}`, { cwd: kit, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 }));
+  if (behind) bad.push(`ai-company: this copy is ${behind} commits behind GitHub; run bash update.sh, and if its pull fails run git status in ${kit}`);
   if (bad.length) {
     console.error('FAIL\n' + bad.map((b) => '  ' + b).join('\n'));
     process.exit(1);

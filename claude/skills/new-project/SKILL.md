@@ -13,7 +13,8 @@ description: Starts a new project for the founder - folder, git, private GitHub 
    README.md -> README.md. Create docs/.
    ci.yml -> .github/workflows/ci.yml only if package-lock.json already
    exists (adopted project). Otherwise skip it: CI fails without a
-   lockfile, and the architect adds it together with the scaffold.
+   lockfile. Whoever scaffolds the project adds it then: the lead, or the
+   architect when the lead's brief asks for the scaffold.
 4. Commit "chore: initial project setup", then
    gh repo create <name> --private --source . --push
 5. Protect main (needs GitHub Pro for private repos; if refused, tell

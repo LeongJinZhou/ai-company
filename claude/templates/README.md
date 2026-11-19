@@ -10,10 +10,10 @@
 - ...
 
 ## Tech stack
-Next.js · TypeScript · PostgreSQL · Prisma · Playwright · GitHub Actions
+React · TypeScript · PHP · MySQL · Playwright · GitHub Actions
 
 ## Architecture
-(mermaid diagram generated from docs/ARCHITECTURE.md)
+(mermaid diagram of the main parts; from docs/ARCHITECTURE.md when the project has one)
 
 ## Quality and security
 - Unit, integration and end-to-end tests run on every pull request
