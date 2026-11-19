@@ -1,14 +1,11 @@
----
-name: lessons
-description: What the company learned across all the founder's projects - what worked, what failed, what cost too much, platform limits. Use in the Study step when a project starts, or when the task is about GitHub data, YouTube, browser voice, a new screen, or anything else named inside.
----
-# Lessons (all projects)
+# Lessons that come with the kit
 
-Verified things only, three lines each at most, newest first, 60 lines at
-most. When a task teaches something a later project needs, add it here.
-Your copy of this file (`SKILL.md`) is yours: git ignores it, so what you
-write never leaves this laptop. The lessons below came with the kit. Keep,
-change or delete them.
+Read together with `SKILL.md` beside this file. Every laptop has the same
+lessons here, and `bash update.sh` brings new ones. Never write in this file
+on a laptop that only uses the kit: own lessons go in `SKILL.md`.
+Whoever releases the kit: before a release, move the lessons worth sharing
+from your own `SKILL.md` into this file, in neutral words (no project or
+client names, no dates).
 
 ## Product and design
 - A task with a new screen cost about 3 times a task without one (browser,
@@ -32,6 +29,9 @@ change or delete them.
   some browsers never fire the "end" event. Always set a timeout.
 
 ## Working method
+- A step an installer prints as "do this by hand" does not happen on other
+  machines. Make the script do it and the check fail without it; compare a
+  real machine with what the installer writes.
 - After a file is untracked and git-ignored, switching to a branch that still
   tracks it replaces it without a warning. Save a copy first
   (`git hash-object -w` and a ref), restore it after.

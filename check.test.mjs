@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { linkProblems, problems, rows, runs, settingsProblems, toolProblems, tools } from './check.mjs';
+import { lessonsProblems, linkProblems, problems, rows, runs, settingsProblems, toolProblems, tools } from './check.mjs';
 
 const here = (p) => join(import.meta.dirname, p);
 const read = (p) => readFileSync(here(p), 'utf8');
@@ -148,8 +148,8 @@ test('README counts match the files', () => {
   each(/(\d+) staff agents/g, readdirSync(here('claude/agents')).filter((f) => f.endsWith('.md')).length);
   each(
     /(\d+) company skills/g,
-    // lessons counts by its starter: its SKILL.md is the founder's own file and is not in the repo.
-    readdirSync(here('claude/skills')).filter((d) => !external.has(d) && ['SKILL.md', 'starter.md'].some((f) => existsSync(here(`claude/skills/${d}/${f}`)))).length,
+    // lessons counts by its kit.md: its SKILL.md is each laptop's own file and is not in the repo.
+    readdirSync(here('claude/skills')).filter((d) => !external.has(d) && ['SKILL.md', 'kit.md'].some((f) => existsSync(here(`claude/skills/${d}/${f}`)))).length,
   );
   each(/(\d+) core plugins?\b/g, plugins.filter((r) => r[2] === 'on').length);
   each(/(\d+) plugins that are off/g, plugins.filter((r) => r[2] === 'off').length);
@@ -275,8 +275,8 @@ test('the lead thinks like a business partner, and the company learns', () => {
     /Minutes, not a\s+report/, /Use the lessons skill when a project starts/,
   ]);
   // Lessons live in a skill: a session can always load a skill, but not a file outside its project folder.
-  all(read('claude/skills/lessons/starter.md'), [/^name: lessons$/m, /^description: .*Use in the Study step when a project starts/m, /Verified things only/, /60 lines at\s+most/]);
-  assert.ok(read('claude/skills/lessons/starter.md').trimEnd().split(/\r?\n/).length <= 70, 'lessons skill over 70 lines');
+  all(read('claude/skills/lessons/own-template.md'), [/^name: lessons$/m, /^description: .*Use in the Study step when a project starts/m, /Verified things only/, /60 lines at\s+most/]);
+  assert.ok(read('claude/skills/lessons/kit.md').trimEnd().split(/\r?\n/).length <= 70, 'the kit lessons are over 70 lines');
   all(section(md, '2\\. Propose'), [
     /Worth building because: the user, the problem, why they would choose this/,
     /My advice: only when you would build less, build something different, or\s+not build it/, /Say why, plainly\. The founder decides/,
@@ -301,13 +301,71 @@ test('the founder\'s own lessons never leave the laptop', () => {
   const own = 'claude/skills/lessons/SKILL.md';
   assert.equal(execFileSync('git', ['ls-files', '--', own], { cwd: here('.'), encoding: 'utf8' }).trim(), '', `${own} is tracked again`);
   assert.match(read('.gitignore'), /^claude\/skills\/lessons\/SKILL\.md$/m);
-  // update.sh creates the own file from the starter once and never overwrites it.
-  assert.ok(read('update.sh').includes('[ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/starter.md" "$LESSONS/SKILL.md"'), 'update.sh does not create the lessons file');
-  assert.match(read('check.mjs'), /'skills', 'lessons', 'SKILL\.md'/);
-  const starter = read('claude/skills/lessons/starter.md');
-  assert.match(starter, /git ignores it, so what you\s+write never leaves this laptop/);
-  assert.doesNotMatch(starter, /\b20\d\d-\d\d-\d\d\b/, 'the starter carries a dated note from one founder');
-  assert.match(starter, /switching to a branch that still\s+tracks it replaces it without a warning/);
+  // update.sh creates the own file from the template once and never overwrites it.
+  assert.ok(read('update.sh').includes('[ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/own-template.md" "$LESSONS/SKILL.md"'), 'update.sh does not create the lessons file');
+  assert.match(read('claude/skills/lessons/own-template.md'), /Git ignores this file, so what you write never leaves\s+this laptop/);
+});
+
+test('every laptop reads the same kit lessons, and they are in git', (t) => {
+  const tracked = execFileSync('git', ['ls-files', '--', 'claude/skills/lessons'], { cwd: here('.'), encoding: 'utf8' }).trim().split(/\r?\n/);
+  assert.deepEqual(tracked, ['claude/skills/lessons/kit.md', 'claude/skills/lessons/own-template.md']);
+  const kit = read('claude/skills/lessons/kit.md');
+  // The kit's lessons are public and shared: neutral words, no dates, no names of one founder's projects.
+  assert.doesNotMatch(kit, /\b20\d\d-\d\d-\d\d\b/, 'the kit lessons carry a dated note from one founder');
+  all(kit, [
+    /^## Product and design$/m, /^## Platforms$/m, /^## Working method$/m, /^## Windows$/m,
+    /switching to a branch that still\s+tracks it replaces it without a warning/, /"do this by\s+hand" does not happen on other\s+machines/,
+    /Never write in this file/, /before a release, move the\s+lessons worth sharing/,
+  ]);
+  // The own file is the skill a session loads; it must send the reader to kit.md, also on a laptop set up before 2.0.2.
+  assert.match(read('claude/skills/lessons/own-template.md'), /First read `kit\.md` beside this file/);
+  assert.ok(read('update.sh').includes('grep -q \'`kit\\.md` beside this file\' "$LESSONS/SKILL.md" || printf'), 'update.sh does not point an older own file to kit.md');
+
+  const dir = mkdtempSync(join(tmpdir(), 'kit-lessons-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  assert.deepEqual(lessonsProblems(dir), ['lessons: your own lessons file is missing; run bash update.sh']);
+  writeFileSync(join(dir, 'SKILL.md'), '# Lessons\n- my own note\n');
+  assert.deepEqual(lessonsProblems(dir), [
+    'lessons: kit.md, the lessons that come with the kit, is missing',
+    'lessons: your own lessons file does not point to kit.md; run bash update.sh',
+  ]);
+  writeFileSync(join(dir, 'kit.md'), kit);
+  // A note that only names a file like "toolkit.md" is not the pointer.
+  writeFileSync(join(dir, 'SKILL.md'), '# Lessons\n- the toolkit.md of that project was out of date\n');
+  assert.deepEqual(lessonsProblems(dir), ['lessons: your own lessons file does not point to kit.md; run bash update.sh']);
+  writeFileSync(join(dir, 'SKILL.md'), read('claude/skills/lessons/own-template.md'));
+  assert.deepEqual(lessonsProblems(dir), []);
+  assert.match(read('check.mjs'), /lessonsProblems\(join\(dest, 'skills', 'lessons'\)\)/);
+});
+
+// Runs the two real lessons lines of update.sh against a throwaway folder.
+test('update.sh never overwrites an own lessons file and points an older one to kit.md once', { skip: process.platform === 'win32' && 'runs on Linux and Mac: on Windows "bash" may not be Git Bash' }, (t) => {
+  const lines = read('update.sh').match(/^\[ -e "\$LESSONS\/SKILL\.md" \].*\n^grep -q .*$/m)?.[0];
+  assert.ok(lines, 'update.sh has no lessons lines');
+  const dir = mkdtempSync(join(tmpdir(), 'kit-lessons-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  for (const name of ['kit.md', 'own-template.md']) writeFileSync(join(dir, name), read(`claude/skills/lessons/${name}`));
+  const own = join(dir, 'SKILL.md');
+  const run = () => execFileSync('bash', ['-c', lines], { env: { ...process.env, LESSONS: dir } });
+  const pointers = () => readFileSync(own, 'utf8').split('`kit.md` beside this file').length - 1;
+
+  run();
+  assert.equal(readFileSync(own, 'utf8'), read('claude/skills/lessons/own-template.md'));
+  run();
+  assert.equal(readFileSync(own, 'utf8'), read('claude/skills/lessons/own-template.md'));
+
+  // Own files as 2.0.0 and 2.0.1 left them: no pointer; Unix or Windows line ends; with or without a last line end.
+  for (const old of ['# Lessons\n- my own note\n', '# Lessons\r\n- my own note\r\n', '# Lessons\n- my own note', '- the toolkit.md of that project\n']) {
+    writeFileSync(own, old);
+    run();
+    const once = readFileSync(own, 'utf8');
+    assert.ok(once.startsWith(old), 'the own notes were changed');
+    assert.match(once, /\nAlso read `kit\.md` beside this file: the lessons that come with the kit\.\n$/);
+    assert.equal(pointers(), 1);
+    assert.deepEqual(lessonsProblems(dir), []);
+    run();
+    assert.equal(readFileSync(own, 'utf8'), once, 'a second run changed the file');
+  }
 });
 
 test('anyone may use the kit', () => {

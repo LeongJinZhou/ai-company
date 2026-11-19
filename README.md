@@ -39,7 +39,7 @@ flowchart TD
     G --> P["Production, on the founder's word:<br>full sweep of the whole product<br>before real users or real data"]
 ```
 
-The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, `claude/skills/lessons/SKILL.md`, read when a project starts. That file is yours: `update.sh` creates it once from `claude/skills/lessons/starter.md`, and git ignores it, so your notes never leave your laptop. It lives inside your clone of this repo: keep a copy before you delete or re-clone that folder.
+The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, lessons, read when a project starts. It has two files in `claude/skills/lessons/`. `kit.md` holds the lessons that come with the kit: it is in this repo, every laptop has the same one, and `bash update.sh` brings new lessons. `SKILL.md` is yours: `update.sh` creates it once, the company adds your own lessons there, and git ignores it, so your notes never leave your laptop. It lives inside your clone of this repo: keep a copy before you delete or re-clone that folder.
 
 There are two modes. Building (steps 1 to 5) is the default and checks each change: the builder never has the last word, a code-reviewer reads every code change, and new screens and risky changes get their own reviewer. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
 
@@ -52,7 +52,7 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 | `claude/CLAUDE.md` | The handbook every session reads first |
 | `claude/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
 | `claude/agents/` | 13 staff agents |
-| `claude/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects; the repo holds a starter, your own copy is never committed) |
+| `claude/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects; the repo holds the kit's lessons in `kit.md`, your own notes are never committed) |
 | `claude/templates/` | 5 project templates |
 | `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
 | `plugins.txt` | Every plugin, and whether it is on or off |
