@@ -4,6 +4,21 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-11-19
+
+### Fixed
+- The three project templates name one stack. The README template said Next.js, PostgreSQL and Prisma while the project CLAUDE.md template said React, PHP and MySQL; both now say React, PHP and MySQL, the stack the real projects use. The CI template runs PHPUnit when the project has `backend/composer.json` (it ran npm commands only, so backend tests never ran on GitHub) and has a `permissions:` block
+- The gitignore template no longer ignores `docs/STATUS.md`: the handbook calls it the project's memory, and it never reached a second laptop. `*.sql` still keeps dumps out, but files under a `migrations` or `fixtures` folder now go into git (every real project had to add that exception by hand). `vendor/` is ignored. Existing projects keep their own `.gitignore`: remove the `docs/STATUS.md` line there by hand
+- Several organisations are no longer forced on every project. `claude/rules/security.md` scopes owned data to its owner (the user, group or organisation it belongs to); the architect adds `organisation_id` only when the spec says so; backend-standards asks for caching and background jobs only when a measurement or the spec calls for them
+- backend-dev and frontend-dev build one part of the approved plan. They follow `docs/API.md` when the project has one; without one the lead's brief must name each endpoint, or they stop and say so. They named `docs/PLAN.md` and `docs/API.md`, which most projects never have
+- site-monitor writes no file any more: it reports, and the lead adds the bugs to `docs/STATUS.md`. It used to rewrite `docs/PLAN.md` as a whole, on the smallest model
+- The architect's first job is the one the handbook names: review the data model in `docs/SPEC.md` and write it to `docs/ARCHITECTURE.md`. The API contract, the scaffold and CI are done only when the lead's brief asks for them
+- The CI template gives its token only the rights it needs: `contents: read` and `pull-requests: read`
+
+### Added
+- `check.mjs` fails when this copy of the kit is behind GitHub. A pull that failed used to end in `OK` with the old company in place
+- Tests that keep agents, skills and templates in line with the handbook: no file may name a doc that nothing writes, the templates must name one stack, the CI template must run every test runner the stack names, and the gitignore template is tried with real git
+
 ## [2.0.2] - 2026-11-19
 
 ### Changed

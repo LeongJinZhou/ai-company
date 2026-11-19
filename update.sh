@@ -21,7 +21,7 @@ command -v gh >/dev/null && gh auth setup-git >/dev/null 2>&1
 if [ "$MODE" != --no-pull ]; then
   echo "== Pull latest ai-company"
   if git -C "$KIT" pull --ff-only; then exec bash "$KIT/update.sh" --no-pull; fi
-  echo "WARN: could not pull ai-company; continuing with the local copy." >&2
+  echo "WARN: could not pull ai-company; continuing with the local copy. If a file here was changed by hand, 'git status' in $KIT shows it." >&2
 fi
 
 # rules/agents/skills/templates are links into this repo, so the pull updated

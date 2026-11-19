@@ -1,5 +1,8 @@
 name: CI
 on: [push, pull_request]
+permissions:
+  contents: read
+  pull-requests: read # the gitleaks step lists a pull request's commits
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -12,6 +15,17 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test -- --coverage
+      # PHP backend in backend/: these steps run only when it is there. A backend
+      # that needs a database for its tests also needs a `services:` block with
+      # mysql in this job, and its env.
+      - if: hashFiles('backend/composer.json') != ''
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with: { php-version: "8.3", extensions: pdo_mysql, coverage: pcov, tools: "composer:v2" }
+      - if: hashFiles('backend/composer.json') != ''
+        run: composer install --working-dir=backend --no-interaction --no-progress && composer audit --working-dir=backend
+      - if: hashFiles('backend/composer.json') != ''
+        run: vendor/bin/phpunit
+        working-directory: backend
       - run: npx playwright install --with-deps && npm run test:e2e
       - run: npm audit --audit-level=high
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
