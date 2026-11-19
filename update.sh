@@ -28,10 +28,12 @@ fi
 # them. On Windows CLAUDE.md is a copy, not a link, and must be refreshed.
 [ -L "$DEST/CLAUDE.md" ] || cp "$KIT/claude/CLAUDE.md" "$DEST/CLAUDE.md"
 
-# Your own lessons: created once from the starter, never overwritten. Git
-# ignores the file, so what you write in it stays on this laptop.
+# Lessons: kit.md comes with the kit and is the same on every laptop. SKILL.md
+# is your own file: created once, never overwritten, ignored by git. An own
+# file from before 2.0.2 gets one line at its end that points to kit.md.
 LESSONS="$KIT/claude/skills/lessons"
-[ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/starter.md" "$LESSONS/SKILL.md"
+[ -e "$LESSONS/SKILL.md" ] || cp "$LESSONS/own-template.md" "$LESSONS/SKILL.md"
+grep -q '`kit\.md` beside this file' "$LESSONS/SKILL.md" || printf '\nAlso read `kit.md` beside this file: the lessons that come with the kit.\n' >> "$LESSONS/SKILL.md"
 
 # The kit's settings (lead model, status line, no attribution lines): added
 # when missing, never changed when you set your own value.

@@ -4,6 +4,16 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-11-19
+
+### Changed
+- The lessons skill has two files. `claude/skills/lessons/kit.md` (was `starter.md`) holds the lessons that come with the kit: it is in the repo, the same on every laptop, and `bash update.sh` brings new lessons to laptops that are already installed. `SKILL.md` stays each laptop's own file, ignored by git and never overwritten; a new one is created from `own-template.md` and starts empty. Before 2.0.2 the starter was copied once, so a laptop never got a lesson that was learned later
+- A laptop installed with 2.0.0 or 2.0.1 keeps its own `SKILL.md` as it is; `bash update.sh` adds one line at its end that points to `kit.md`. That file still holds the copy of the old starter lessons: delete those lines once, they are in `kit.md` now
+- `check.mjs` fails when `kit.md` is missing or the own lessons file does not point to it
+
+### Added
+- `check.mjs` prints a warning when semgrep is installed but cannot scan. Seen on one Windows laptop with semgrep 1.184.0: every scan stops with `Unix_error: Invalid argument socketpair`, while `semgrep --version` works
+
 ## [2.0.1] - 2026-11-18
 
 ### Added

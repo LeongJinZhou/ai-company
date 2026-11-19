@@ -41,6 +41,24 @@ export function linkProblems(kitFolder, configFolder) {
   return out;
 }
 
+// Problems with the lessons skill. kit.md is the kit's file, the same on every laptop;
+// SKILL.md is the laptop's own file and must tell the reader to read kit.md too.
+export function lessonsProblems(folder) {
+  const own = join(folder, 'SKILL.md');
+  if (!existsSync(own)) return ['lessons: your own lessons file is missing; run bash update.sh'];
+  const out = [];
+  if (!existsSync(join(folder, 'kit.md'))) out.push('lessons: kit.md, the lessons that come with the kit, is missing');
+  let text = '';
+  try {
+    text = readFileSync(own, 'utf8');
+  } catch {
+    return [...out, 'lessons: your own lessons file cannot be read'];
+  }
+  // The same words update.sh looks for before it adds the pointer line.
+  if (!text.includes('`kit.md` beside this file')) out.push('lessons: your own lessons file does not point to kit.md; run bash update.sh');
+  return out;
+}
+
 // One problem line for each tool that does not run.
 export const toolProblems = (names, works) =>
   names.filter((name) => !works(`${name} --version`)).map((name) => `${name}: not installed; run the installer again`);
@@ -75,9 +93,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const [repo, name] of rows('skills.txt')) {
     if (!existsSync(join(dest, 'skills', name, 'SKILL.md'))) bad.push(`${repo}: skill ${name} missing`);
   }
-  if (!existsSync(join(dest, 'skills', 'lessons', 'SKILL.md'))) {
-    bad.push('lessons: your own lessons file is missing; run bash update.sh');
-  }
+  bad.push(...lessonsProblems(join(dest, 'skills', 'lessons')));
   bad.push(...linkProblems(join(kit, 'claude'), dest));
   const handbook = join(dest, 'CLAUDE.md');
   if (!existsSync(handbook)) bad.push('CLAUDE.md: missing; run bash update.sh');
@@ -94,4 +110,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1);
   }
   console.log(`OK: ${wanted.filter((r) => r[1] !== '-').length} plugins, ${rows('refs.txt').length} reference repos, ${rows('skills.txt').length} GitHub skills, handbook, settings and tools in place.`);
+  // semgrep can be installed and still unable to scan (seen on Windows). The laptop still
+  // matches the kit, so this is a warning: the lead then reports that semgrep did not run.
+  if (!runs('semgrep scan -e "eval(...)" --lang js --metrics off --quiet check.mjs')) {
+    console.log('WARN: semgrep is installed but cannot scan on this laptop. Security checks run without it; say so in every report.');
+  }
 }
