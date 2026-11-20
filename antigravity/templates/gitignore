@@ -11,7 +11,7 @@ test-results/
 !.env.example
 *.log
 .DS_Store
-.claude/
+.agents/
 # Database dumps and exports stay out of git. Migrations and test fixtures are code:
 # keep schema and seed SQL in a migrations/ folder, and only fake data in fixtures/.
 *.sql

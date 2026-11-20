@@ -1,3 +1,6 @@
+---
+trigger: always_on
+---
 # Security rules (every project, every task)
 
 Apply these without being asked, from the first line of a prototype. Apply

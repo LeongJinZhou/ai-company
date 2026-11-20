@@ -1,3 +1,6 @@
+---
+trigger: always_on
+---
 # Testing rules (every task)
 
 Tests grow with the product. Never delete, skip or weaken a test to make it

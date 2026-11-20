@@ -1,16 +1,19 @@
-// Verifies this machine matches plugins.txt, refs.txt, claude/ and the tools the installers add. Exit 1 on any mismatch.
+// Verifies this machine matches plugins.txt, refs.txt, antigravity/ and the tools the installers add. Exit 1 on any mismatch.
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { delimiter, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { additions, missing, readSettings } from './settings-merge.mjs';
+import { additions, missing, readSettings, settingsFile } from './settings-merge.mjs';
 
 const kit = dirname(fileURLToPath(import.meta.url));
-const dest = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude');
+const dest = join(homedir(), '.gemini', 'config');
 
 // The programs the handbook's checks call. Both installers install every one.
-export const tools = ['gh', 'gitleaks', 'semgrep', 'osv-scanner', 'bun', 'ccusage'];
+export const tools = ['gh', 'gitleaks', 'semgrep', 'osv-scanner', 'bun'];
+
+// The folders the Antigravity installers put agy in; they do not always add it to PATH.
+export const agyFolders = (home) => [join(home, '.gemini', 'bin'), join(home, '.local', 'bin'), join(home, 'AppData', 'Local', 'agy', 'bin')];
 
 // True when a command runs on this machine. It runs from the kit folder, never from the
 // folder the user stands in (on Windows that folder is searched for programs first), and
@@ -21,6 +24,15 @@ export const runs = (command) => {
     return true;
   } catch {
     return false;
+  }
+};
+
+// What a command prints, or '' when it fails or hangs. Runs from the kit folder, like `runs`.
+export const output = (command) => {
+  try {
+    return execSync(command, { cwd: kit, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 60000 });
+  } catch {
+    return '';
   }
 };
 
@@ -63,6 +75,25 @@ export function lessonsProblems(folder) {
 export const toolProblems = (names, works) =>
   names.filter((name) => !works(`${name} --version`)).map((name) => `${name}: not installed; run the installer again`);
 
+// True when an installed plugin carries hooks that were written for Claude Code: such hooks
+// can write into ~/.claude, the setup of the Claude Code kit that may live on the same laptop.
+export function claudeHooks(pluginFolder) {
+  return ['hooks.json', join('hooks', 'hooks.json')].some((file) => {
+    try {
+      return /CLAUDE_|\.claude\b/.test(readFileSync(join(pluginFolder, file), 'utf8'));
+    } catch {
+      return false;
+    }
+  });
+}
+
+// The model names `agy models` prints: one "<id><tab><label>" line per model.
+export const modelLabels = (text) =>
+  text
+    .split(/\r?\n/)
+    .filter((line) => line.includes('\t'))
+    .map((line) => line.split('\t')[1].trim());
+
 // How many commits this copy of the kit is behind its branch on GitHub. 0 when that cannot
 // be known: no network, or a branch that follows nothing. `git` runs one git command in the kit folder.
 export function commitsBehind(git) {
@@ -86,21 +117,22 @@ export const rows = (file) =>
     .map((line) => line.split(/\s+/));
 
 // Returns the list of problems; empty means the machine matches.
+// `installed` is what `agy plugin list --json` prints: one { name, enabled } per plugin.
 export function problems(wanted, installed) {
   const out = [];
-  for (const [, id, state] of wanted) {
-    if (id === '-') continue;
-    // A plugin can be listed once per scope; the user-scope entry is the one the kit manages.
-    const found = installed.find((p) => p.id === id && p.scope === 'user');
-    if (!found) out.push(`${id}: not installed`);
-    else if (found.enabled !== (state === 'on')) out.push(`${id}: should be ${state}`);
+  for (const [, name, state] of wanted) {
+    if (name === '-') continue;
+    const found = installed.find((p) => p.name === name);
+    if (!found) out.push(`${name}: not installed`);
+    else if (found.enabled !== (state === 'on')) out.push(`${name}: should be ${state}`);
   }
   return out;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  process.env.PATH = [process.env.PATH, ...agyFolders(homedir())].join(delimiter);
   const wanted = rows('plugins.txt');
-  const installed = JSON.parse(execSync('claude plugin list --json', { encoding: 'utf8' }));
+  const installed = JSON.parse(execSync('agy plugin list --json', { cwd: kit, encoding: 'utf8' }));
   const bad = problems(wanted, installed);
   for (const [repo] of rows('refs.txt')) {
     if (!existsSync(join(dest, 'vendor', repo.split('/')[1], '.git'))) bad.push(`${repo}: reference repo missing`);
@@ -109,17 +141,20 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (!existsSync(join(dest, 'skills', name, 'SKILL.md'))) bad.push(`${repo}: skill ${name} missing`);
   }
   bad.push(...lessonsProblems(join(dest, 'skills', 'lessons')));
-  bad.push(...linkProblems(join(kit, 'claude'), dest));
-  const handbook = join(dest, 'CLAUDE.md');
-  if (!existsSync(handbook)) bad.push('CLAUDE.md: missing; run bash update.sh');
-  else if (readFileSync(handbook, 'utf8') !== readFileSync(join(kit, 'claude', 'CLAUDE.md'), 'utf8')) {
-    bad.push('CLAUDE.md: differs from the repo copy');
+  bad.push(...linkProblems(join(kit, 'antigravity'), dest));
+  const handbook = join(dest, 'GEMINI.md');
+  if (!existsSync(handbook)) bad.push('GEMINI.md: missing; run bash update.sh');
+  else if (readFileSync(handbook, 'utf8') !== readFileSync(join(kit, 'antigravity', 'GEMINI.md'), 'utf8')) {
+    bad.push('GEMINI.md: differs from the repo copy');
   }
-  bad.push(...settingsProblems(readSettings(join(dest, 'settings.json')), additions()));
-  if (!runs('claude mcp get playwright')) {
-    bad.push('playwright: browser connection missing; run: claude mcp add --scope user playwright npx @playwright/mcp@latest');
+  bad.push(...settingsProblems(readSettings(settingsFile()), additions()));
+  if (!/^playwright\s/m.test(output('agy mcp list'))) {
+    bad.push('playwright: browser connection missing; run: agy mcp add playwright npx @playwright/mcp@latest');
   }
   bad.push(...toolProblems(tools, runs));
+  // The real thing, once: an agy that answers --version can still be unable to reach its models.
+  const offered = modelLabels(output('agy models'));
+  if (!offered.length) bad.push('agy: cannot list its models; start agy once and sign in');
   // A pull that failed leaves an old company in place; without this line the check would still say OK.
   const behind = commitsBehind((args) => execSync(`git ${args}`, { cwd: kit, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 }));
   if (behind) bad.push(`ai-company: this copy is ${behind} commits behind GitHub; run bash update.sh, and if its pull fails run git status in ${kit}`);
@@ -128,6 +163,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1);
   }
   console.log(`OK: ${wanted.filter((r) => r[1] !== '-').length} plugins, ${rows('refs.txt').length} reference repos, ${rows('skills.txt').length} GitHub skills, handbook, settings and tools in place.`);
+  // The laptop matches the kit, but this account's plan may not offer the kit's lead model.
+  const lead = additions().model;
+  if (!offered.includes(lead)) {
+    console.log(`WARN: this account is not offered the kit's lead model "${lead}". Pick the best model you have with /model.`);
+  }
+  // A plugin that is on runs its hooks in every session. The kit keeps none on that carries Claude Code hooks.
+  for (const plugin of installed.filter((p) => p.enabled && p.path && claudeHooks(p.path))) {
+    console.log(`WARN: the plugin ${plugin.name} is on and carries hooks written for Claude Code; they may write into ~/.claude. Turn it off when the task is done: agy plugin disable ${plugin.name}`);
+  }
   // semgrep can be installed and still unable to scan (seen on Windows). The laptop still
   // matches the kit, so this is a warning: the lead then reports that semgrep did not run.
   if (!runs('semgrep scan -e "eval(...)" --lang js --metrics off --quiet check.mjs')) {

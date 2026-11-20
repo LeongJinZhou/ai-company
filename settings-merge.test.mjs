@@ -6,6 +6,8 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { additions, merge, missing, readSettings } from './settings-merge.mjs';
 
+// Sample settings with sections, to test the merge itself. The kit's own file
+// (antigravity/settings-additions.json) holds one key today: the lead model.
 const kitSettings = { model: 'opus', env: { ECC_GATEGUARD: 'off' }, attribution: { commit: '', pr: '', sessionUrl: false } };
 
 test('missing keys are added, at the top and inside a section', () => {
@@ -52,7 +54,7 @@ function run(settingsText) {
   const dir = mkdtempSync(join(tmpdir(), 'kit-settings-'));
   const file = join(dir, 'settings.json');
   if (settingsText !== undefined) writeFileSync(file, settingsText);
-  const once = () => spawnSync(process.execPath, [join(import.meta.dirname, 'settings-merge.mjs')], { env: { ...process.env, CLAUDE_CONFIG_DIR: dir }, encoding: 'utf8' });
+  const once = () => spawnSync(process.execPath, [join(import.meta.dirname, 'settings-merge.mjs')], { env: { ...process.env, AI_COMPANY_SETTINGS_DIR: dir }, encoding: 'utf8' });
   return { dir, file, once, text: () => readFileSync(file, 'utf8') };
 }
 
@@ -68,6 +70,17 @@ test('a machine with no settings file gets the kit settings, and no backup', (t)
   if (process.platform !== 'win32') assert.equal(statSync(m.file).mode & 0o777, 0o600);
 });
 
+// The Antigravity CLI makes its settings folder only when it first saves a setting.
+test('a machine with no settings folder yet gets the folder and the kit settings', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'kit-settings-'));
+  t.after(() => rmSync(dir, { recursive: true }));
+  const folder = join(dir, 'not', 'there', 'yet');
+  const result = spawnSync(process.execPath, [join(import.meta.dirname, 'settings-merge.mjs')], { env: { ...process.env, AI_COMPANY_SETTINGS_DIR: folder }, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(readFileSync(join(folder, 'settings.json'), 'utf8')), additions());
+  assert.ok(!existsSync(join(folder, 'settings.json.backup')));
+});
+
 test('a settings file that is a link stays a link and keeps its permissions', { skip: process.platform === 'win32' && 'Windows needs admin rights to make a link' }, (t) => {
   const dir = mkdtempSync(join(tmpdir(), 'kit-settings-'));
   t.after(() => rmSync(dir, { recursive: true }));
@@ -75,31 +88,31 @@ test('a settings file that is a link stays a link and keeps its permissions', { 
   const config = join(dir, 'config');
   const link = join(config, 'settings.json');
   mkdirSync(config);
-  writeFileSync(real, '{ "model": "sonnet" }', { mode: 0o640 });
+  writeFileSync(real, '{ "theme": "dark" }', { mode: 0o640 });
   chmodSync(real, 0o640);
   symlinkSync(real, link);
-  const result = spawnSync(process.execPath, [join(import.meta.dirname, 'settings-merge.mjs')], { env: { ...process.env, CLAUDE_CONFIG_DIR: config }, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [join(import.meta.dirname, 'settings-merge.mjs')], { env: { ...process.env, AI_COMPANY_SETTINGS_DIR: config }, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(lstatSync(link).isSymbolicLink(), 'the link was replaced by a plain file');
   const merged = JSON.parse(readFileSync(real, 'utf8'));
-  assert.equal(merged.model, 'sonnet');
+  assert.equal(merged.theme, 'dark');
   assert.deepEqual(missing(merged, additions()), []);
   assert.equal(statSync(real).mode & 0o777, 0o640);
-  assert.equal(readFileSync(`${link}.backup`, 'utf8'), '{ "model": "sonnet" }');
+  assert.equal(readFileSync(`${link}.backup`, 'utf8'), '{ "theme": "dark" }');
   assert.ok(!existsSync(`${real}.tmp`));
 });
 
 test('existing settings keep their values, get one backup, and a second run changes nothing', (t) => {
-  const original = '﻿{ "model": "sonnet", "theme": "dark", "env": { "MY_VAR": "1" } }';
+  const original = '﻿{ "theme": "dark", "permissions": { "allow": ["command(git status)"] } }';
   const m = run(original);
   t.after(() => rmSync(m.dir, { recursive: true }));
   const first = m.once();
   assert.equal(first.status, 0, first.stderr);
-  assert.match(first.stdout, /settings: added env\.ECC_GATEGUARD, attribution, statusLine/);
+  assert.match(first.stdout, /^settings: added model$/m);
   const merged = JSON.parse(m.text());
-  assert.equal(merged.model, 'sonnet');
+  assert.equal(merged.model, additions().model);
   assert.equal(merged.theme, 'dark');
-  assert.deepEqual(merged.env, { MY_VAR: '1', ECC_GATEGUARD: 'off' });
+  assert.deepEqual(merged.permissions, { allow: ['command(git status)'] });
   assert.deepEqual(missing(merged, additions()), []);
   assert.equal(readFileSync(`${m.file}.backup`, 'utf8'), original);
 

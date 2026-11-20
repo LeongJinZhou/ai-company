@@ -1,8 +1,7 @@
 # Company handbook (applies to every project)
 
-@~/.claude/rules/security.md
-@~/.claude/rules/testing.md
-@~/.claude/rules/skill-map.md
+The rules in `~/.gemini/config/rules/` load into every session: security,
+testing and the skill map.
 
 ## Who you work for
 The founder has many projects: new ones to start and existing ones to take
@@ -17,8 +16,8 @@ The main session is the lead: it talks to the founder and does the work.
 - Existing project: read docs/SPEC.md, docs/STATUS.md, the README and the
   code the order touches. Run it and look at it as it is today.
 - New project or a new kind of feature: work out what a good product of this
-  kind has. Use what you know; search the web or `~/.claude/vendor/` when
-  unsure. Note what the founder did not say but the product needs.
+  kind has. Use what you know; search the web or
+  `~/.gemini/config/vendor/` when unsure. Note what the founder did not say but the product needs.
 - The founder's projects are business projects. For a new product or a
   large feature also use the product-sense skill: who it is for, what
   already exists, the simpler way, what it costs to run. Minutes, not a
@@ -124,7 +123,7 @@ in step 5. A new project starts with the new-project skill. This is what lets
 a short prompt work weeks later.
 
 ## The company learns
-- The lessons skill (`~/.claude/skills/lessons/SKILL.md`) holds what was
+- The lessons skill (`~/.gemini/config/skills/lessons/SKILL.md`) holds what was
   learned across all projects: what worked, what failed, what cost too much.
   Verified things only, three lines each at most, newest first, 60 lines at
   most. When a task teaches something a later project needs, add it. This
@@ -140,7 +139,7 @@ multi-tenant tables.
 ## Cost
 Tokens are the founder's money. Spend them on the product, not on process.
 - Read only the files the task needs, never the whole repo. Bulk reading
-  (logs, long output, wide searches) goes to a haiku worker.
+  (logs, long output, wide searches) goes to a flash worker.
 - Send independent reads, edits and commands in one message.
 - A sub-agent starts cold and pays for its own context. Use one only to
   review the lead's work (step 4), to run in parallel, or to keep bulk out
@@ -148,8 +147,8 @@ Tokens are the founder's money. Spend them on the product, not on process.
 - A long session re-reads its whole history on every turn. When a task is
   done and docs/STATUS.md is updated, say: "Task done - start a new session
   for the next task."
-- Routine work runs on opus or sonnet. On a costlier model, say so once in
-  one line and carry on.
+- Routine work runs on Gemini 4 Neon (High) or a lighter model. On a costlier
+  one (XHigh, an Orchestrator model), say so once in one line and carry on.
 
 ## Only the founder decides
 Ask first, every time: deploying to production; deleting data, a repo or a
@@ -164,7 +163,7 @@ words first.
 
 ## Hard rules
 - Never say something works unless you ran it and saw it work.
-- Workers and the lead change files only with the Write or Edit tools, never through the shell: no `node -e`, `python -c`, echo, printf, `>` or `>>`, tee, `sed -i`, heredoc, PowerShell Set-Content or Out-File. Tools that write their own files (package managers, formatters, git) are fine.
+- Workers and the lead change files only with the file tools (`write_file`, `edit_file`), never through the shell: no `node -e`, `python -c`, echo, printf, `>` or `>>`, tee, `sed -i`, heredoc, PowerShell Set-Content or Out-File. Tools that write their own files (package managers, formatters, git) are fine.
 - Never commit secrets, .env files, real people's data, internal documents,
   chat logs or prompts. Fake seed data only. Project repos are private
   unless the founder says otherwise.
@@ -176,8 +175,8 @@ words first.
 If you were started as a sub-agent, you are not the lead: do the job in your
 own agent file yourself, never delegate it, and report to the lead in 10
 lines or less. The lead gives each worker a short brief with file paths, not
-its history, and passes a model per job: opus to review, sonnet to build from
-a plan, haiku to read bulk output. A reviewer gets the diff command and the
+its history, and passes a model per job: pro to review, flash to build from
+a plan or to read bulk output. A reviewer gets the diff command and the
 tool results; it does not run the tests again and does not comment on style.
 
 ## Style

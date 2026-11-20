@@ -1,5 +1,27 @@
 # Status
 
+## This branch: the company for Google Antigravity (2026-11-20)
+This is the `antigravity` branch. It is the kit of `main` at 2.0.3 with Claude Code switched to Google Antigravity, kept side by side with `main` and never merged into it. Everything below "Done" is the history of the Claude Code kit and is kept for reference.
+
+Tried on the real `agy` 1.5.9 on Windows, signed in, lead model Gemini 4 Neon (High):
+- In a project folder: a `GEMINI.md`, a rule file with `trigger: always_on`, a skill and a custom agent with `model: pro` all loaded, and the lead ran the agent.
+- Agent tools: an agent with no `tools:` line got no shell and no file tools. The documented names (`view_file`, `grep_search`, `run_command`, `write_to_file`, `replace_file_content`, `search_web`, `read_url_content`) were all accepted; none hung.
+- Plugins, in a throwaway home folder: 12 of 15 installed with `agy plugin install https://github.com/<repo>` (Claude Code plugins are converted). taste-skill and awesome-gamedev-agent-skills: "could not detect plugin structure". rea: its clone fails on Windows (a file name in a submodule). A disabled plugin keeps its files on disk, and an install over an existing one replaces it and keeps it disabled.
+- `agy mcp add` and `agy mcp list` for Playwright and Sentry, in the throwaway home folder.
+- The real files, copied into a project folder: the handbook and the three rule files loaded (the lead quoted them), and six of the 13 agents answered with the tools their file names: code-reviewer and site-monitor read and run commands, planner reads and writes, backend-dev also edits, security-researcher also searches the web. Each of them was also offered the Playwright connection of that folder.
+- `bash update.sh --no-pull` and `--check` against a throwaway home folder, with the four folders linked the way the Windows installer links them.
+
+Open on this branch:
+- The lead model label in `settings.json` and the files in `~/.gemini/config` (the handbook, the rules, the agents) were not tried from the global folder on a real laptop; the same files were tried from a project folder. The first real install is that test.
+- No staff agent clicked through a real page yet: the agents were offered the Playwright tools, but none was asked to use them. The Sentry connection was not tried with an account.
+- `install-windows.bat` itself was not run; its steps were done by hand in the throwaway home folder.
+- The converted plugins install, but none was used in a real task. caveman is the only one that is on: it arrives with its skills and no hooks that Antigravity reads, so nothing of it writes into `~/.claude`, and its always-on short voice was not seen working here. ecc and superpowers bring a `hooks/hooks.json` written for Claude Code; whether Antigravity runs it, and whether it then writes into `~/.claude`, was not tried. They are off; the skill map makes the lead ask before enabling one, and `check.mjs` warns about any that is on. flightdeck, ctx-handoff and claude-mem were written around Claude Code's hooks and may do nothing here.
+- `agy models` also answered in the throwaway home folder, so the check's "agy cannot list its models" line was never seen to fire.
+- In headless mode (`agy -p`) a staff agent that needs a shell command stops at the permission question. In a normal session the question reaches the founder.
+- No cost was measured on Antigravity. The benchmark below is the Claude Code kit's.
+- The Mac installer was not run.
+- `claude-mem` and the text of some converted plugins still say "Claude"; that is their own wording.
+
 ## Done
 - 2.0.3 (2026-11-19): agents, skills and templates agree with the handbook again. An outside read of 2.0.2 found that the rewrite of the handbook in 2.0.0 left v1 wording behind: three templates with two different stacks, a CI template that never ran the PHP tests, a gitignore template that kept `docs/STATUS.md` and migration files out of git, organisation scoping forced on every project, and builders that followed `docs/PLAN.md` and `docs/API.md`. All confirmed against the files and against the real projects, then fixed; tests now check agreement, not only the handbook's wording. `check.mjs` fails when the copy is behind GitHub.
 - 2.0.2 (2026-11-19): the kit's lessons are one file in git (`claude/skills/lessons/kit.md`), the same on every laptop and brought up to date by `bash update.sh`. Each laptop's own notes stay in its own ignored `SKILL.md`. Why: with the copied starter of 2.0.0 a second laptop never got a later lesson, and the first founder's lessons lived on one laptop only. `check.mjs` warns when semgrep cannot scan.
@@ -61,4 +83,4 @@ Each run with `claude -p` on an opus lead in a throwaway folder; cost from the r
 - This repo has no `docs/SPEC.md` of its own.
 
 ## Next step
-On every laptop: `bash update.sh`, then restart Claude Code. It must end with `OK: ...`.
+On every laptop: `bash update.sh`, then restart Antigravity. It must end with `OK: ...`.

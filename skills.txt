@@ -1,4 +1,4 @@
 # Skills that live in their own GitHub repo:  <github repo>  <skill folder name>
-# Shallow-cloned into ~/.claude/skills/<name> and pulled on every update run.
-# That folder is a link into claude/skills here, so each name is in .gitignore.
+# Shallow-cloned into ~/.gemini/config/skills/<name> and pulled on every update run.
+# That folder is a link into antigravity/skills here, so each name is in .gitignore.
 Charonyuu/whatsmyagentdoing  myoffice

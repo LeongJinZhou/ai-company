@@ -1,8 +1,9 @@
-// Adds the kit's settings (claude/settings-additions.json) to ~/.claude/settings.json.
+// Adds the kit's settings (antigravity/settings-additions.json) to the Antigravity CLI's
+// settings file, ~/.gemini/antigravity-cli/settings.json.
 // Only missing keys are added: a value you set yourself is never changed.
 // The file as it was before the first change is kept as settings.json.backup,
 // unless a file of that name is already there.
-import { copyFileSync, existsSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,7 +31,10 @@ export function merge(current, additions) {
   return out;
 }
 
-export const additions = () => JSON.parse(readFileSync(join(kit, 'claude', 'settings-additions.json'), 'utf8'));
+export const additions = () => JSON.parse(readFileSync(join(kit, 'antigravity', 'settings-additions.json'), 'utf8'));
+
+// This machine's settings file. AI_COMPANY_SETTINGS_DIR names another folder; the tests use it.
+export const settingsFile = () => join(process.env.AI_COMPANY_SETTINGS_DIR || join(homedir(), '.gemini', 'antigravity-cli'), 'settings.json');
 
 // The settings of this machine: {} when there is no file yet, null when the file cannot be read as a JSON object.
 export function readSettings(file) {
@@ -44,7 +48,7 @@ export function readSettings(file) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const file = join(process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude'), 'settings.json');
+  const file = settingsFile();
   const current = readSettings(file);
   if (current === null) {
     console.error(`settings: ${file} could not be read as a JSON object; nothing was changed. Repair the file, then run bash update.sh.`);
@@ -57,6 +61,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const target = existsSync(file) ? realpathSync(file) : file;
     const tmp = `${target}.tmp`;
     try {
+      // A laptop where the CLI never saved a setting has no settings folder yet.
+      mkdirSync(dirname(target), { recursive: true });
       if (existsSync(file) && !existsSync(`${file}.backup`)) copyFileSync(file, `${file}.backup`);
       // Written beside the file and renamed, so a stopped run never leaves half a settings file.
       // The file keeps its permissions; a new one is for its owner only, as settings can hold tokens.
@@ -66,7 +72,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       renameSync(tmp, target);
     } catch (error) {
       rmSync(tmp, { force: true });
-      console.error(`settings: ${file} could not be written (${error.code || error.message}); nothing was changed. Close other Claude sessions, then run bash update.sh.`);
+      console.error(`settings: ${file} could not be written (${error.code || error.message}); nothing was changed. Close other Antigravity sessions, then run bash update.sh.`);
       process.exit(1);
     }
     console.log(`settings: added ${added.join(', ')}`);

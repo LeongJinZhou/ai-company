@@ -1,13 +1,15 @@
 <p align="center"><img src="docs/assets/banner.svg" alt="ai-company" width="100%"></p>
 
-[![ci](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml/badge.svg)](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml)
+[![ci](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml/badge.svg?branch=antigravity)](https://github.com/LeongJinZhou/ai-company/actions/workflows/ci.yml)
 
-An AI assistant for Claude Code, built like a small software company. You are the founder.
+**This is the `antigravity` branch: the same company, for Google Antigravity.** The `main` branch is the original for Claude Code. The two do not share a file on your laptop: this branch installs into `~/.gemini` only and never touches `~/.claude`.
+
+An AI assistant for Google Antigravity, built like a small software company. You are the founder.
 You give a topic and a few rough points. It studies the product, shows you one short plan, and after your yes it builds, checks its own work and shows you the result.
 
 ## Who it is for
 
-One person who builds software products with Claude Code and wants results to look at, not a process to manage: a solo founder, a freelancer, a small team with one decision maker. It is a working method (a handbook, rules, staff agents and skills), not an app. It is not for teams that need several people to approve a change.
+One person who builds software products with Antigravity and wants results to look at, not a process to manage: a solo founder, a freelancer, a small team with one decision maker. It is a working method (a handbook, rules, staff agents and skills), not an app. It is not for teams that need several people to approve a change.
 
 ## How it works
 
@@ -39,7 +41,7 @@ flowchart TD
     G --> P["Production, on the founder's word:<br>full sweep of the whole product<br>before real users or real data"]
 ```
 
-The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, lessons, read when a project starts. It has two files in `claude/skills/lessons/`. `kit.md` holds the lessons that come with the kit: it is in this repo, every laptop has the same one, and `bash update.sh` brings new lessons. `SKILL.md` is yours: `update.sh` creates it once, the company adds your own lessons there, and git ignores it, so your notes never leave your laptop. It lives inside your clone of this repo: keep a copy before you delete or re-clone that folder.
+The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, lessons, read when a project starts. It has two files in `antigravity/skills/lessons/`. `kit.md` holds the lessons that come with the kit: it is in this repo, every laptop has the same one, and `bash update.sh` brings new lessons. `SKILL.md` is yours: `update.sh` creates it once, the company adds your own lessons there, and git ignores it, so your notes never leave your laptop. It lives inside your clone of this repo: keep a copy before you delete or re-clone that folder.
 
 There are two modes. Building (steps 1 to 5) is the default and checks each change: the builder never has the last word, a code-reviewer reads every code change, and new screens and risky changes get their own reviewer. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
 
@@ -49,71 +51,81 @@ The founder is not interviewed: no rounds of questions. The lead fills the gaps 
 
 | Path | What |
 |---|---|
-| `claude/CLAUDE.md` | The handbook every session reads first |
-| `claude/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
-| `claude/agents/` | 13 staff agents |
-| `claude/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects; the repo holds the kit's lessons in `kit.md`, your own notes are never committed) |
-| `claude/templates/` | 5 project templates |
-| `claude/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
+| `antigravity/GEMINI.md` | The handbook every session reads first |
+| `antigravity/rules/` | Always-on rules: security, testing and the skill map. Every file here loads into every session, so nothing else goes in |
+| `antigravity/agents/` | 13 staff agents |
+| `antigravity/skills/` | 8 company skills: new-project, brief-to-spec, backend-standards, frontend-standards, security-checklist, scale-standards (read only when a product needs that scale), product-sense (business thinking for a new product or large feature), lessons (what was learned across all projects; the repo holds the kit's lessons in `kit.md`, your own notes are never committed) |
+| `antigravity/templates/` | 5 project templates |
+| `antigravity/git-hooks/` | 2 git hooks: commit-msg, pre-commit |
 | `plugins.txt` | Every plugin, and whether it is on or off |
-| `refs.txt` | 4 reference repos kept in `~/.claude/vendor` |
+| `refs.txt` | 5 reference repos kept in `~/.gemini/config/vendor` |
 | `skills.txt` | Skills pulled from their own GitHub repo (`/myoffice`: live view of all agents) |
-| `.claude-plugin/marketplace.json` | This repo as a plugin marketplace (the blast-radius plugin) |
 | `update.sh`, `check.mjs` | Update everything to latest, then verify |
-| `claude/settings-additions.json`, `settings-merge.mjs` | The kit's settings, and the script that adds the missing ones to `~/.claude/settings.json` |
+| `antigravity/settings-additions.json`, `settings-merge.mjs` | The kit's settings, and the script that adds the missing ones to `~/.gemini/antigravity-cli/settings.json` |
 | `office-proxy.mjs`, `office-remote.cmd` | Private phone access to the office page |
 | `docs/STATUS.md` | Project state: done, decisions, benchmark, open issues |
 | `CHANGELOG.md` | What changed, one line per change |
 | `LICENSE` | MIT: use it, copy it, change it |
 
+## What differs from the Claude Code kit
+
+The handbook, the rules, the skills, the templates and the 13 agents say the same thing as on `main`. What had to change for Antigravity:
+
+- Files live in `~/.gemini/config` (handbook `GEMINI.md`, `rules`, `agents`, `skills`, `templates`, `vendor`), not in `~/.claude`. A project's own file is `GEMINI.md`, not `CLAUDE.md`.
+- A rule file starts with `trigger: always_on`; that line is what makes Antigravity load it into every session.
+- An agent file names a model class, not one model: `pro` (was opus and fable) or `flash` (was sonnet and haiku). It lists its tools by the names Antigravity documents (`view_file`, `grep_search`, `run_command`, `write_to_file`, `replace_file_content`), and an agent that only reviews gets no tool that changes a file. The command line tool shows the same tools to the model as `read_file`, `run_command`, `write_file` and `edit_file`; the handbook's hard rule uses those names. The Playwright and Sentry connections reach an agent without being listed.
+- Plugins are named without a marketplace (`impeccable`, not `impeccable@impeccable`) and are on or off for the whole machine, not per project.
+- Left out, because they only exist for Claude Code: the blast-radius plugin, the ccusage status line, the "no attribution" setting, and the two Claude Code how-to repos. taste-skill, the gamedev skills and rea do not install as Antigravity plugins; they are cloned as reference repos and the skill map points to their files.
+
 ## What you need
 
-- Claude Code with a paid Claude plan or an API key.
+- Antigravity (the `agy` command line tool, 1.5.9 or newer) with a Google account that Antigravity accepts. A paid Google AI plan is needed for the stronger models.
 - Windows or Mac.
-- The models the company names. The lead runs on opus. Each staff agent names its own model in the `model:` line of its file in `claude/agents/`: most review on opus and build on sonnet, the architect uses fable and the site monitor haiku. If your plan lacks one, change that line.
+- The models the company names. The lead runs on Gemini 4 Neon (High), the default model of Antigravity when this was written. Each staff agent names its model class in the `model:` line of its file in `antigravity/agents/`: reviewers and the architect use `pro`, builders and the site monitor use `flash`. If your plan lacks the lead model, `bash update.sh` says so in one WARN line: pick another with `/model`.
 
 The installer changes your machine. Read `install-windows.bat` or `install-mac.command` before you run it. What it does:
 
-- Programs: it installs Claude Code if it is missing, and Node, Git, GitHub CLI, gitleaks, semgrep, osv-scanner, bun and ccusage. On Windows also Python. On Mac also Homebrew if it is missing: its install script is downloaded and run.
-- `~/.claude`: `rules`, `agents`, `skills` and `templates` become links into this repo. A folder that is already there is renamed to `<name>.backup` first.
-- The handbook goes to `~/.claude/CLAUDE.md`. On Mac a file that is already there is renamed to `CLAUDE.md.backup`. On Windows it is copied to `CLAUDE.md.backup` once, and then replaced at install and on every `bash update.sh`.
-- Git, for every repo on the machine: the global hooks path is set to `claude/git-hooks`, so a repo's own `.git/hooks` no longer run unless that repo sets its own hooks path. The `commit-msg` hook removes Claude co-author and "Generated with Claude Code" lines from every commit message; the `pre-commit` hook runs gitleaks. The default branch name becomes `main`, and GitHub CLI becomes git's sign-in helper for GitHub (`gh auth setup-git`). To undo the hooks: `git config --global --unset core.hooksPath`.
+- Programs: it installs the Antigravity command line tool if it is missing (its install script is downloaded from `antigravity.google` and run), and Node, Git, GitHub CLI, gitleaks, semgrep, osv-scanner and bun. On Windows also Python. On Mac also Homebrew if it is missing: its install script is downloaded and run.
+- `~/.gemini/config`: `rules`, `agents`, `skills` and `templates` become links into this repo. A folder that is already there is renamed to `<name>.backup` first.
+- The handbook goes to `~/.gemini/config/GEMINI.md`. On Mac a file that is already there is renamed to `GEMINI.md.backup`. On Windows it is copied to `GEMINI.md.backup` once, and then replaced at install and on every `bash update.sh`.
+- Git, for every repo on the machine: the global hooks path is set to `antigravity/git-hooks`, so a repo's own `.git/hooks` no longer run unless that repo sets its own hooks path. This is done only when no hooks path is set: a laptop that also has the Claude Code kit keeps that kit's hooks. Those run gitleaks too, but their `commit-msg` hook removes Claude lines only, so on such a laptop a Gemini or Antigravity attribution line stays in the commit message. The `commit-msg` hook of this branch removes AI co-author and "Generated with" lines (Claude, Gemini, Antigravity) from every commit message; the `pre-commit` hook runs gitleaks. The default branch name becomes `main`, and GitHub CLI becomes git's sign-in helper for GitHub (`gh auth setup-git`). To undo the hooks: `git config --global --unset core.hooksPath`.
 - GitHub CLI asks you to sign in (`gh auth login`) if you are not signed in.
-- Claude Code: the Playwright MCP server, the Sentry MCP server, every plugin in `plugins.txt`, the built-in plugin `cc-plugin-you-should-know`, the 4 reference repos of `refs.txt` in `~/.claude/vendor`, and the myoffice skill from the repo named in `skills.txt`. Sentry is a connection to `https://mcp.sentry.dev/mcp` that the site-monitor agent uses; nothing is sent until you sign in with your own Sentry account. If you do not use Sentry, remove it: `claude mcp remove sentry -s user`.
-- `~/.claude/settings.json`: at install and on every `bash update.sh`, the keys of `claude/settings-additions.json` that your file lacks are added: the lead model (`opus`), ECC GateGuard off, no Claude attribution on commits and pull requests, and the ccusage status line. A value you set yourself is never changed. A key you delete is added again on the next update: to differ from the kit, set your own value instead of deleting the key. The file as it was before the first change is kept as `settings.json.backup`, unless a file of that name is already there. GateGuard is ECC's check-before-edit gate; the blast-radius plugin is the preview for risky shell commands.
+- Antigravity: the Playwright MCP server, the Sentry MCP server, every plugin in `plugins.txt`, the 5 reference repos of `refs.txt` in `~/.gemini/config/vendor`, and the myoffice skill from the repo named in `skills.txt`. A plugin written for Claude Code is converted by Antigravity when it is installed. Sentry is a connection to `https://mcp.sentry.dev/mcp` that the site-monitor agent uses; nothing is sent until you sign in with your own Sentry account. If you do not use Sentry, remove it: `agy mcp remove sentry`.
+- `~/.gemini/antigravity-cli/settings.json`: at install and on every `bash update.sh`, the keys of `antigravity/settings-additions.json` that your file lacks are added. Today that is one key: the lead model (`Gemini 4 Neon (High)`). A value you set yourself is never changed. A key you delete is added again on the next update: to differ from the kit, set your own value instead of deleting the key. The file as it was before the first change is kept as `settings.json.backup`, unless a file of that name is already there.
 
 ## What it costs
 
-You pay for tokens through your Claude plan or API key; the kit itself is free. Measured on 2026-11-17 on small test projects with an opus lead, at API prices, one run each: a small task cost $1.21 to $1.93, a task with a new screen $3.78, and a production sweep of a small library $1.86. Your numbers will differ. The table is in `docs/STATUS.md`.
+You pay through your Google AI plan or a Gemini API key; the kit itself is free. Nothing has been measured on Antigravity yet. On the Claude Code kit (branch `main`, 2026-11-17, small test projects, API prices, one run each) a small task cost $1.21 to $1.93, a task with a new screen $3.78, and a production sweep of a small library $1.86; that table is in `docs/STATUS.md`. Expect other numbers here.
 
 ## Install
 
-1. Install Git, then clone this repo into your home folder:
-   `git clone https://github.com/LeongJinZhou/ai-company` (the repo is public; no sign-in is needed to clone it).
+1. Install Git, then clone this branch into its own folder in your home folder:
+   `git clone -b antigravity https://github.com/LeongJinZhou/ai-company ai-company-antigravity` (the repo is public; no sign-in is needed to clone it).
+   If you also use the Claude Code kit, keep its clone as it is: the two folders must stay apart, because each kit links its files into its own clone.
    To change the company for yourself, fork it first and clone your fork.
 2. Double-click `install-windows.bat` (Windows) or `install-mac.command` (Mac).
-3. Restart Claude Code.
+3. Restart Antigravity.
 
-The installer prints `OK: ...` when the laptop matches the repo: plugins, reference repos, skills, agents, rules, handbook, settings, the browser connection and the tools, and when this copy is not behind GitHub. Every laptop that prints `OK` has the same company. The one thing no install can set is the model you pick: in the desktop app the model picker overrides the `opus` setting, so choose the model there for each new session.
+The installer prints `OK: ...` when the laptop matches the repo: plugins, reference repos, skills, agents, rules, handbook, settings, the browser connection and the tools, when `agy` can list its models, and when this copy is not behind GitHub. Every laptop that prints `OK` has the same company.
 
 ## Update (any laptop, any time)
 
     bash update.sh
 
-It pulls this repo, then the latest version of every marketplace, plugin and
+It pulls this branch, then the latest version of every plugin and
 reference repo, and checks the result. On Windows run it from Git Bash.
 `bash update.sh --check` only checks.
 
 ```mermaid
 flowchart TD
-    R["This repo"] --> I["install-windows.bat<br>install-mac.command<br>update.sh"]
-    I --> H["~/.claude<br>CLAUDE.md, rules, agents,<br>skills, templates"]
+    R["This repo, branch antigravity"] --> I["install-windows.bat<br>install-mac.command<br>update.sh"]
+    I --> H["~/.gemini/config<br>GEMINI.md, rules, agents,<br>skills, templates"]
     P["plugins.txt"] --> PI["plugins installed,<br>on or off"]
-    X["refs.txt"] --> V["~/.claude/vendor"]
-    S["skills.txt"] --> K["~/.claude/skills"]
-    A["settings-additions.json"] --> T["~/.claude/settings.json<br>missing keys added"]
+    X["refs.txt"] --> V["~/.gemini/config/vendor"]
+    S["skills.txt"] --> K["~/.gemini/config/skills"]
+    A["settings-additions.json"] --> T["~/.gemini/antigravity-cli/settings.json<br>missing keys added"]
     T --> C
-    H -- "CLAUDE.md, agents, rules" --> C["check.mjs prints OK"]
+    H -- "GEMINI.md, agents, rules" --> C["check.mjs prints OK"]
     PI --> C
     V --> C
     K --> C
@@ -121,16 +133,15 @@ flowchart TD
 
 ## Plugins
 
-There is 1 core plugin, always on (caveman), and 15 plugins that are off until a task needs them; one more marketplace is added for on-demand installs.
+There is 1 core plugin, always on (caveman), and 11 plugins that are off until a task needs them.
 
 A plugin that is `on` in `plugins.txt` loads into every session, so the core
-is kept small: with five plugins on, a new session loaded about 76,000 tokens
-before the first word. The rest are installed but off, so they cost nothing
+is kept small. The rest are installed but off, so they cost nothing
 until needed. Their skill files are still on disk and the lead reads them
-when a task matches. `claude/rules/skill-map.md` tells the lead which skill
-or plugin fits which kind of task, and how to enable one for a project:
+when a task matches. `antigravity/rules/skill-map.md` tells the lead which skill
+or plugin fits which kind of task, and how to enable one:
 
-    claude plugin enable <plugin@marketplace> --scope project
+    agy plugin enable <plugin>
 
 To change the set everywhere: edit `plugins.txt`, commit, push, run
 `bash update.sh` on each laptop.
@@ -139,13 +150,15 @@ Plugins run their own hooks and code on your machine. Only add ones you trust.
 
 ## Changing the company
 
-In your own fork: edit files and open a pull request. It is squash-merged, and
-`CHANGELOG.md` records each change. Other laptops get it with `bash update.sh`.
-`node --test` runs the tests; CI runs them on every push.
+In your own fork: edit files and open a pull request against the `antigravity`
+branch. It is squash-merged, and `CHANGELOG.md` records each change. Other
+laptops get it with `bash update.sh`. `node --test` runs the tests; CI runs
+them on every push. This branch is never merged into `main`: the two kits are
+kept side by side.
 
 ## Watching the agents
 
-Type `/myoffice` in Claude Code. A local page opens at `http://localhost:4545`
+Type `/myoffice` in Antigravity. A local page opens at `http://localhost:4545`
 showing every session and what it is doing. `/myoffice stop` closes it.
 
 First time in each browser: open **Settings** (gear, top right) and turn on
@@ -176,7 +189,7 @@ now. Never use `tailscale funnel` for this: that would make the page public.
 ## Security notes
 
 - This repo is public. It holds the working method only: rules, agents, skills and the installer. Project code stays in its own private repos, and your own lessons file stays on your laptop.
-- No secrets, .env files or real data go in this repo. The `pre-commit` hook in `claude/git-hooks/` runs gitleaks on staged changes and blocks the commit if it finds a secret. It does nothing if gitleaks is not installed. It needs gitleaks 8.19 or newer; the installers install gitleaks.
+- No secrets, .env files or real data go in this repo. The `pre-commit` hook in `antigravity/git-hooks/` runs gitleaks on staged changes and blocks the commit if it finds a secret. It does nothing if gitleaks is not installed. It needs gitleaks 8.19 or newer; the installers install gitleaks.
 
 ## Licence
 

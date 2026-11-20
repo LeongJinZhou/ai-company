@@ -45,7 +45,7 @@ Write `none` in a section that does not apply; never drop section 7.
 Show the handbook's step 2 plan, at most 15 lines: what will be built (the
 founder's points and the ones you added), the look, data and security, what
 is left out, and the skills this project will use (from
-`~/.claude/rules/skill-map.md`, each file found with Glob, a design skill if
+`~/.gemini/config/rules/skill-map.md`, each file found by name, a design skill if
 the project has screens, no row "just in case"). Wait for the founder's yes.
-After the yes, write the skills list into the project CLAUDE.md under
+After the yes, write the skills list into the project GEMINI.md under
 `## Skills` and start building the first slice.

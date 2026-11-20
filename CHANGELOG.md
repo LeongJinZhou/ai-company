@@ -4,6 +4,17 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+### Added (branch `antigravity` only)
+- The company for Google Antigravity, on its own branch beside the Claude Code kit of `main`. The folder `claude/` is `antigravity/` here, the handbook is `antigravity/GEMINI.md`, and everything installs into `~/.gemini`: handbook, rules, agents, skills and templates in `~/.gemini/config`, the lead model in `~/.gemini/antigravity-cli/settings.json`. Nothing under `~/.claude` is read or written, and a test keeps it so
+- The lead model is Gemini 4 Neon (High). The 13 agents name a model class: `pro` for reviewers, the architect and the planner, `flash` for builders and the site monitor. Each agent lists its tools by Antigravity's names; an agent without that line gets no shell and no file tools
+- The three rule files start with `trigger: always_on`, the line that makes Antigravity load them into every session. The handbook no longer imports them with `@` lines
+- `plugins.txt` names 12 plugins by the name `agy plugin list` shows. `update.sh` installs each with `agy plugin install https://github.com/<repo>`; Antigravity converts a Claude Code plugin on install. taste-skill, awesome-gamedev-agent-skills and rea do not install that way and are cloned as reference repos
+- `check.mjs` asks `agy` for its models, so an `agy` that cannot list them fails the check; it warns when the account is not offered the lead model, and when a plugin that is on carries hooks written for Claude Code (they may write into `~/.claude`)
+- The installers set git's global hooks path only when none is set, so a laptop with both kits keeps the hooks it has. The `commit-msg` hook also removes Gemini and Antigravity attribution lines
+
+### Removed (branch `antigravity` only)
+- What only exists for Claude Code: the blast-radius plugin and its marketplace file, the ccusage status line and tool, the attribution and GateGuard settings, and the two Claude Code how-to reference repos
+
 ## [2.0.3] - 2026-11-19
 
 ### Fixed

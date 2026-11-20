@@ -1,28 +1,23 @@
-# One line per plugin:  <github repo>  <plugin@marketplace>  <on|off>
+# One line per plugin:  <github repo>  <plugin name>  <on|off>
+# The plugin name is the one `agy plugin list` shows after the install.
 # on  = enabled in every session (the core).
-# off = installed and kept up to date, enabled per project when a task needs it
-#       (see claude/rules/skill-map.md).
-# A plugin of "-" only adds the marketplace; install from it on demand.
+# off = installed and kept up to date, enabled when a task needs it
+#       (see antigravity/rules/skill-map.md).
+# Each one is installed with `agy plugin install https://github.com/<repo>`;
+# Antigravity converts a Claude Code plugin on install.
 
 # Core
-JuliusBrussee/caveman                        caveman@caveman                          on
+JuliusBrussee/caveman                        caveman                  on
 
 # Ready, off until needed
-affaan-m/ECC                                 ecc@ecc                                  off
-DietrichGebert/ponytail                      ponytail@ponytail                        off
-obra/superpowers                             superpowers@superpowers-dev              off
-thedotmack/claude-mem                        claude-mem@thedotmack                    off
-mattpocock/skills                            mattpocock-skills@mattpocock             off
-multica-ai/andrej-karpathy-skills            andrej-karpathy-skills@karpathy-skills   off
-scasella/claude-flightdeck                   flightdeck@claude-flightdeck             off
-cablate/ctx-handoff-mod                      ctx-handoff@ctx-handoff-mod              off
-nextlevelbuilder/ui-ux-pro-max-skill         ui-ux-pro-max@ui-ux-pro-max-skill        off
-Leonxlnx/taste-skill                         taste-skill@taste-skill                  off
-pbakaus/impeccable                           impeccable@impeccable                    off
-coreyhaines31/marketingskills                marketing-skills@marketingskills         off
-gamedev-skills/awesome-gamedev-agent-skills  gamedev@awesome-gamedev-agent-skills     off
-morluto/rea                                  rea@rea                                  off
-LeongJinZhou/ai-company                      blast-radius@ai-company                  off
-
-# Marketplace only
-anthropics/claude-code                       -                                        -
+affaan-m/ECC                                 ecc                      off
+DietrichGebert/ponytail                      ponytail                 off
+obra/superpowers                             superpowers              off
+thedotmack/claude-mem                        claude-mem               off
+mattpocock/skills                            mattpocock-skills        off
+multica-ai/andrej-karpathy-skills            andrej-karpathy-skills   off
+scasella/claude-flightdeck                   flightdeck               off
+cablate/ctx-handoff-mod                      ctx-handoff              off
+nextlevelbuilder/ui-ux-pro-max-skill         ui-ux-pro-max            off
+pbakaus/impeccable                           impeccable               off
+coreyhaines31/marketingskills                marketing-skills         off
