@@ -121,6 +121,8 @@ how success is measured, its look, the decisions made.
 docs/STATUS.md: done, open, next step. Read both at the start; update them
 in step 5. A new project starts with the new-project skill. This is what lets
 a short prompt work weeks later.
+docs/STATUS.md stays short: the two newest rounds of work in full. Older
+ones move, unchanged, to docs/HISTORY.md, read only when a task needs it.
 
 ## The company learns
 - The lessons skill (`~/.gemini/config/skills/lessons/SKILL.md`) holds what was

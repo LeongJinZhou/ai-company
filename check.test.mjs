@@ -222,12 +222,13 @@ test('agents, skills and templates agree with the handbook', () => {
     .filter((f) => /\.(md|yml)$/.test(f) && !f.startsWith('antigravity/skills/myoffice/') && !f.startsWith('antigravity/skills/synced/') && !f.startsWith('antigravity/skills/.trash/') && f !== 'antigravity/skills/lessons/SKILL.md');
   const files = ['agents', 'rules', 'skills', 'templates'].flatMap(kitFiles);
   assert.ok(files.length > 25, `only ${files.length} files found`);
-  // Every project has SPEC.md and STATUS.md. The other docs exist only when their writer ran.
+  // Every project has SPEC.md and STATUS.md, and the lead moves older rounds from STATUS.md to
+  // HISTORY.md (handbook, Every project remembers). The other docs exist only when their writer ran.
   const writer = { 'ARCHITECTURE.md': 'antigravity/agents/architect.md', 'API.md': 'antigravity/agents/architect.md', 'PLAN.md': 'antigravity/agents/planner.md', 'RELEASE.md': 'antigravity/agents/devops-engineer.md' };
   for (const file of files) {
     const text = read(file);
     for (const [, name] of text.matchAll(/docs\/([A-Z]+\.md)/g)) {
-      if (name === 'SPEC.md' || name === 'STATUS.md') continue;
+      if (name === 'SPEC.md' || name === 'STATUS.md' || name === 'HISTORY.md') continue;
       assert.ok(writer[name], `${file} names docs/${name}, which nothing writes`);
     }
     // Outside its writer, such a doc may only be named as something a project may have.
@@ -639,6 +640,9 @@ test('agent models are pinned', () => {
 test('every project remembers, and the founder is spoken to in plain words', () => {
   const md = read('antigravity/GEMINI.md');
   all(section(md, 'Every project remembers'), [/docs\/SPEC\.md/, /docs\/STATUS\.md/, /Read both at the start/, /new-project skill/]);
+  // The status file is read by every session, so it must not grow without limit. Nothing is deleted.
+  all(section(md, 'Every project remembers'), [/STATUS\.md stays short: the two newest rounds/, /move, unchanged, to docs\/HISTORY\.md/, /read only when a task needs it/]);
+  all(read('antigravity/templates/project-GEMINI.md'), [/docs\/HISTORY\.md \(in git\)/, /Read it only when a task needs it, never at the start/]);
   all(section(md, 'Style'), [/Plain words to the founder/, /no jargon/, /answer first, then the reason, then the next step/, /Never drop not, never, no,\s+only or a number/]);
   all(section(md, 'Who you work for'), [/a topic and a few rough\s+points/, /only have to look and say yes/, /The main session is the lead/]);
 });

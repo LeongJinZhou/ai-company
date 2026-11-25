@@ -4,6 +4,9 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+### Added
+- The handbook keeps `docs/STATUS.md` short: the two newest rounds of work stay there in full, older ones move, unchanged, to `docs/HISTORY.md`, which a session reads only when a task needs it. The project template names the new file. Seen on one project: the status file had grown to 65 KB because every round was appended, and every session read all of it; after the move it was 10 KB and nothing was lost. Existing projects are not changed by this: the lead moves the older rounds the next time it updates the status file
+
 ### Added (branch `antigravity` only)
 - The company for Google Antigravity, on its own branch beside the Claude Code kit of `main`. The folder `claude/` is `antigravity/` here, the handbook is `antigravity/GEMINI.md`, and everything installs into `~/.gemini`: handbook, rules, agents, skills and templates in `~/.gemini/config`, the lead model in `~/.gemini/antigravity-cli/settings.json`. Nothing under `~/.claude` is read or written, and a test keeps it so
 - The lead model is Gemini 4 Neon (High). The 13 agents name a model class: `pro` for reviewers, the architect and the planner, `flash` for builders and the site monitor. Each agent lists its tools by Antigravity's names; an agent without that line gets no shell and no file tools
