@@ -27,5 +27,8 @@ The lead reads these before building and hands the paths to any worker. Add a ro
 
 ## Key docs
 docs/SPEC.md · docs/STATUS.md (both in git: they are the project's memory).
+docs/HISTORY.md (in git): older rounds moved out of docs/STATUS.md, unchanged.
+Read it only when a task needs it, never at the start. What is still open
+stays in docs/STATUS.md.
 Only when the project has them: docs/ARCHITECTURE.md · docs/API.md ·
 docs/PLAN.md · docs/RELEASE.md
