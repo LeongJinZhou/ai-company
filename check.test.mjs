@@ -275,7 +275,7 @@ test('README has the banner, the CI badge and three diagrams', () => {
 test('README diagram 2 shows the five steps and the one yes', () => {
   const blocks = [...read('README.md').matchAll(/```mermaid([\s\S]*?)```/g)].map((m) => m[1]);
   assert.equal(blocks.length, 3);
-  all(blocks[1], [/1\. Study/, /2\. Propose/, /Founder says yes\?/, /3\. Build/, /4\. Check/, /independent reviewers/, /5\. Show/, /only on the founder's word/, /Production/, /full sweep of the whole product/]);
+  all(blocks[1], [/1\. Study/, /2\. Propose/, /Founder says yes\?/, /3\. Build/, /4\. Check/, /fast, by the lead alone/, /Push live, on the founder's word/, /every test, then independent reviewers/, /5\. Show/, /only on the founder's word/, /Production/, /full sweep of the whole product/]);
   assert.doesNotMatch(read('README.md'), /founder-proxy|\bTiny\b|\bRisky\b/);
 });
 
@@ -308,7 +308,8 @@ test('every screen gets a design skill, fitting motion and every state', () => {
     /Motion where it helps/, /none where it distracts \(login, forms,\s+settings\)/, /hover, pressed, focus, empty, loading, error/,
     /Phone and big screen/, /never emoji/,
   ]);
-  all(section(md, '4\\. Check yourself'), [/use every feature in a real browser/, /generic or AI-made/, /Every new screen or redesign then goes to\s+ux-reviewer/]);
+  all(section(md, '4\\. Check yourself'), [/use what changed in a real browser/, /generic or AI-made/]);
+  assert.match(section(md, 'Push live'), /ux-reviewer on every new screen or\s+redesign/);
   all(section(md, '5\\. Show'), [/A screenshot or a local URL/, /at most 8 lines/, /"tests pass" is not "good"/]);
 });
 
@@ -323,14 +324,15 @@ test('security is always on, scale only when the product needs it', () => {
   assert.doesNotMatch(read('claude/skills/backend-standards/SKILL.md'), /organisation_id|large organisations/);
   all(read('claude/rules/security.md'), [/from the first line of a prototype/, /Never\s+skip a rule that does apply/, /parameterised queries/, /No secrets in frontend code/]);
   all(section(md, '3\\. Build'), [/Server\s+code: backend-standards and security-checklist/, /apply from the first\s+line of a prototype/, /Secrets, tokens, keys and anything worth stealing\s+live on the server/]);
-  all(section(md, '4\\. Check yourself'), [/against the security-checklist skill/, /Login,\s+permission checks, database queries, payment, upload, personal data or a\s+new dependency also goes to security-reviewer/, /security-researcher/]);
+  assert.match(section(md, '4\\. Check yourself'), /against the security-checklist skill/);
+  all(section(md, 'Push live'), [/security-reviewer for login, permission checks, database\s+queries, payment, upload, personal data or a new dependency/, /security-researcher on a new dependency/]);
   assert.match(read('claude/agents/security-reviewer.md'), /^description: .*login, permission checks, database queries, payment, upload, personal data or a new dependency/m);
 });
 
 test('code stays in order and one feature is not a chain of agents', () => {
   const md = read('claude/CLAUDE.md');
   all(section(md, '3\\. Build'), [
-    /The lead builds/, /Never a chain of planner, approver and builder/, /one job per file/, /no dead\s+code, no copy-pasted blocks/,
+    /The lead builds, alone/, /only when the founder\s+asks for parallel work/, /Never a chain of planner, approver and builder/, /one job per file/, /no dead\s+code, no copy-pasted blocks/,
     /smallest change that fully does the job/, /Never cut validation, permission checks, error handling or tests/,
   ]);
   assert.doesNotMatch(md, /founder-proxy|\bTiny\b|\bRisky\b|\btiers?\b|ecc:/i);
@@ -340,11 +342,20 @@ test('code stays in order and one feature is not a chain of agents', () => {
 
 test('the builder never has the last word on its own work', () => {
   const md = read('claude/CLAUDE.md');
-  all(section(md, '4\\. Check yourself'), [
-    /The builder never has the last word on its own work/, /Tools first: lint, typecheck, tests and gitleaks/, /Red means fix, not show/,
-    /one saved browser test of its main path/, /code-reviewer reads every code change/, /Only a small order \(step 2\) skips it/,
-    /Send the reviewers in one message/, /Fix every\s+medium or higher finding; the reviewer that raised it checks the fix/, /hard-bug row of the skill map/,
+  // The independent review happens once, on all that changed, before anything goes live.
+  all(section(md, 'Push live'), [
+    /The builder never has the last word on its own work/, /On the founder's word\s+"push live", before the push/, /Every test, lint, typecheck and gitleaks/,
+    /Red means fix, not push/, /In one message: code-reviewer/, /Fix every medium or higher finding; the reviewer that raised it checks\s+the fix/,
   ]);
+  // During an order the check is fast: measured in November 2026, test runs took 9 hours a day
+  // and one order took three times the model steps once every change got the full check.
+  all(section(md, '4\\. Check yourself'), [
+    /no reviewers, no sub-agents, no pull request/, /Tools first: lint, typecheck, gitleaks, and only the tests of the files\s+the change touched/,
+    /Never the full suite here/, /Red means fix, not show/, /one saved browser test of its main path/, /hard-bug row of the skill map/,
+  ]);
+  assert.doesNotMatch(section(md, '4\\. Check yourself'), /code-reviewer|ux-reviewer|security-reviewer/);
+  assert.match(read('claude/rules/testing.md'), /run only the tests of the files the change touched\. The\s+full suite runs once, on the founder's word "push live"/);
+  assert.match(read('claude/agents/code-reviewer.md'), /^description: .*Use in the push-live check and the production sweep, never during an order\.$/m);
   assert.match(section(md, '3\\. Build'), /architect reviews the data\s+model in docs\/SPEC\.md once, before any code/);
   const cr = read('claude/agents/code-reviewer.md');
   const front = (cr.match(/^---\r?\n([\s\S]*?)\r?\n---/) || ['', ''])[1];
@@ -505,8 +516,8 @@ test('only the founder decides outward and irreversible actions', () => {
   const md = read('claude/CLAUDE.md');
   all(section(md, 'Only the founder decides'), [
     /deploying to production/, /deleting data, a repo or a\s+branch with unmerged work/, /a force push/, /making a repo public/,
-    /messages to real people/, /a paid service/, /secrets and credentials/, /Commit,\s+push, merge and release happen on the founder's word/,
-    /Changing the company itself/, /needs the founder's yes to a change described in plain\s+words first/,
+    /messages to real people/, /a paid service/, /secrets and credentials/, /Commit,\s+push, merge and release happen on the founder's word; the lead does them\s+itself, github-secretary only a release/,
+    /A pull request only for a\s+protected branch/, /Changing the company itself/, /needs the founder's yes to a change described in plain\s+words first/,
   ]);
   const sec = read('claude/agents/github-secretary.md');
   all(sec, [
@@ -561,7 +572,7 @@ test('every project remembers, and the founder is spoken to in plain words', () 
 test('tokens are spent on the product, not on process', () => {
   all(section(read('claude/CLAUDE.md'), 'Cost'), [
     /Read only the files the task needs, never the whole repo/, /goes to a haiku worker/, /in one message/,
-    /A sub-agent starts cold/, /re-reads its whole history on every turn/, /Task done - start a new session\s+for the next task/,
+    /A sub-agent starts cold/, /Use one only for\s+the push-live check, for parallel work the founder asked for/, /re-reads its whole history on every turn/, /Task done - start a new session\s+for the next task/,
     /Routine work runs on opus or sonnet/, /say so once in\s+one line and carry on/,
   ]);
   // Only these rule files may load into every session.

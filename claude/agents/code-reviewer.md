@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Independent read-only review of a code change, or of the whole codebase in the production sweep - wrong logic, missing error handling, tangled or dead code, broken structure. Use on every code change except a small tweak.
+description: Independent read-only review of a code change, or of the whole codebase in the production sweep - wrong logic, missing error handling, tangled or dead code, broken structure. Use in the push-live check and the production sweep, never during an order.
 tools: Read, Grep, Glob, Bash
 model: opus
 ---

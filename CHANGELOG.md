@@ -4,6 +4,10 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 
 ## [Unreleased]
 
+### Changed
+- An order is checked fast, by the lead alone: lint, typecheck, gitleaks, only the tests of the files the change touched, and a real browser. No reviewers, no sub-agents and no pull request during an order. The full check moved to one place, the new handbook section "Push live": on the founder's word "push live" every test runs and the reviewers read all that changed since the last one (code-reviewer; ux-reviewer for new screens; security-reviewer and security-researcher for risky changes). Why: measured on one laptop over 40 days, a model step took about 3 seconds on every day and every model, but once every change got the full check an order took about three times the model steps, and test runs grew from 0 to 9 hours a day
+- The lead commits, pushes and merges itself, on the founder's word. github-secretary is only for a release. A pull request only where the branch is protected. backend-dev and frontend-dev only when the founder asks for parallel work
+
 ### Added
 - The handbook keeps `docs/STATUS.md` short: everything still open and the two newest rounds of work stay there in full, older rounds move, unchanged, to `docs/HISTORY.md`, which a session reads only when a task needs it. Open work never moves out of the status file: no session reads the history at the start. The project template names the new file. Seen on one project: the status file had grown to 65 KB because every round was appended, and every session read all of it; after the move it was 10 KB and nothing was lost. Existing projects are not changed by this: the lead moves the older rounds the next time it updates the status file
 
