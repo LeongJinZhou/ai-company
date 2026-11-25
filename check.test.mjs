@@ -640,9 +640,10 @@ test('agent models are pinned', () => {
 test('every project remembers, and the founder is spoken to in plain words', () => {
   const md = read('antigravity/GEMINI.md');
   all(section(md, 'Every project remembers'), [/docs\/SPEC\.md/, /docs\/STATUS\.md/, /Read both at the start/, /new-project skill/]);
-  // The status file is read by every session, so it must not grow without limit. Nothing is deleted.
-  all(section(md, 'Every project remembers'), [/STATUS\.md stays short: the two newest rounds/, /move, unchanged, to docs\/HISTORY\.md/, /read only when a task needs it/]);
-  all(read('antigravity/templates/project-GEMINI.md'), [/docs\/HISTORY\.md \(in git\)/, /Read it only when a task needs it, never at the start/]);
+  // The status file is read by every session, so it must not grow without limit. Nothing is deleted,
+  // and open work never moves out of sight: no session reads HISTORY.md at the start.
+  all(section(md, 'Every project remembers'), [/STATUS\.md stays short: everything still open, and the two newest rounds/, /move, unchanged, to docs\/HISTORY\.md/, /read only\s+when a task needs it/]);
+  all(read('antigravity/templates/project-GEMINI.md'), [/docs\/HISTORY\.md \(in git\)/, /Read it only when a task needs it, never at the start/, /What is still open\s+stays in docs\/STATUS\.md/]);
   all(section(md, 'Style'), [/Plain words to the founder/, /no jargon/, /answer first, then the reason, then the next step/, /Never drop not, never, no,\s+only or a number/]);
   all(section(md, 'Who you work for'), [/a topic and a few rough\s+points/, /only have to look and say yes/, /The main session is the lead/]);
 });
