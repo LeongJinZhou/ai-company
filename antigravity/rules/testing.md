@@ -15,6 +15,8 @@ pass.
 - Each finished feature leaves one saved browser test (Playwright) of its
   main path, so a later change cannot quietly break it.
 - Lint and typecheck pass where the project has them.
+- During an order, run only the tests of the files the change touched. The
+  full suite runs once, on the founder's word "push live".
 
 ## Before real users or real data
 All three levels, on a clean run, with CI on GitHub green:

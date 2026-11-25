@@ -51,10 +51,9 @@ with your pick first. That is the only kind of question.
   and a .gitignore first if the folder has no git). Nothing is pushed. On
   the founder's word "undo", return to the last checkpoint and say what was
   undone.
-- The lead builds. On a large project, parts that do not depend on each
-  other may go to backend-dev and frontend-dev in parallel, each with the
-  approved plan. Never a chain of planner, approver and builder for one
-  feature.
+- The lead builds, alone. backend-dev and frontend-dev only when the founder
+  asks for parallel work. Never a chain of planner, approver and builder for
+  one feature.
 - A new project with a database or a login: architect reviews the data
   model in docs/SPEC.md once, before any code.
 - Read the plan's skill files before writing. Any screen: a design skill
@@ -73,30 +72,33 @@ with your pick first. That is the only kind of question.
   live on the server.
 
 ### 4. Check yourself, before the founder sees it
-The builder never has the last word on its own work.
-- Tools first: lint, typecheck, tests and gitleaks. Red means fix, not show.
-- Run it and use every feature in a real browser. Fix what breaks. Each
+Fast, by the lead alone: no reviewers, no sub-agents, no pull request.
+- Tools first: lint, typecheck, gitleaks, and only the tests of the files
+  the change touched. Never the full suite here. Red means fix, not show.
+- Run it and use what changed in a real browser. Fix what breaks. Each
   finished feature leaves one saved browser test of its main path.
-- code-reviewer reads every code change: wrong logic, missing error
-  handling, tangled or dead code. Only a small order (step 2) skips it.
-- Screens: look at the screenshot yourself first. Would the founder call it
-  generic or AI-made? Fix it. Every new screen or redesign then goes to
-  ux-reviewer.
-- Security: check the diff against the security-checklist skill. Login,
-  permission checks, database queries, payment, upload, personal data or a
-  new dependency also goes to security-reviewer; a new dependency to
-  security-researcher.
-- Send the reviewers in one message so they run in parallel. Fix every
-  medium or higher finding; the reviewer that raised it checks the fix. A
-  bug that survives one fix: the hard-bug row of the skill map.
+- Screens: look at the screenshot yourself. Would the founder call it
+  generic or AI-made? Fix it.
+- Security: check the diff against the security-checklist skill. A bug that
+  survives one fix: the hard-bug row of the skill map.
 
 ### 5. Show
 A screenshot or a local URL, then at most 8 lines: what was built, how to try
 it, what changed (files, database, settings), what you assumed, what is not
-done. Say what you verified and what only
-the founder's eyes can judge; "tests pass" is not "good". End with one line
-"I noticed" when you saw something the founder should know: unfinished work,
-a risk, a cheaper way.
+done. Say what you verified and what only the founder's eyes can judge;
+"tests pass" is not "good". End with one line "I noticed" when you saw
+something the founder should know: unfinished work, a risk, a cheaper way.
+
+## Push live: the full check, once
+The builder never has the last word on its own work. On the founder's word
+"push live", before the push, on all changes since the last one:
+- Every test, lint, typecheck and gitleaks. Red means fix, not push.
+- In one message: code-reviewer; ux-reviewer on every new screen or
+  redesign; security-reviewer for login, permission checks, database
+  queries, payment, upload, personal data or a new dependency;
+  security-researcher on a new dependency.
+- Fix every medium or higher finding; the reviewer that raised it checks
+  the fix.
 
 ## Production: the full sweep, on the founder's word "production"
 Steps 1 to 5 check each change. This checks the whole product, once, before
@@ -144,22 +146,24 @@ Tokens are the founder's money. Spend them on the product, not on process.
 - Read only the files the task needs, never the whole repo. Bulk reading
   (logs, long output, wide searches) goes to a flash worker.
 - Send independent reads, edits and commands in one message.
-- A sub-agent starts cold and pays for its own context. Use one only to
-  review the lead's work (step 4), to run in parallel, or to keep bulk out
-  of the lead's context.
+- A sub-agent starts cold and pays for its own context. Use one only for
+  the push-live check, for parallel work the founder asked for, or to keep
+  bulk out of the lead's context.
 - A long session re-reads its whole history on every turn. When a task is
   done and docs/STATUS.md is updated, say: "Task done - start a new session
   for the next task."
 - Routine work runs on Gemini 4 Neon (High) or a lighter model. On a costlier
-  one (XHigh, an Orchestrator model), say so once in one line and carry on.
+  one, say so once in one line and carry on.
 
 ## Only the founder decides
 Ask first, every time: deploying to production; deleting data, a repo or a
 branch with unmerged work; a database change that can lose data (back it
 up first); a force push; making a repo public; sending
 messages to real people; a paid service; secrets and credentials. Commit,
-push, merge and release happen on the founder's word; github-secretary does
-them. A local checkpoint (step 3) is not a release and needs no word.
+push, merge and release happen on the founder's word; the lead does them
+itself, github-secretary only a release. A pull request only for a
+protected branch.
+A local checkpoint (step 3) is not a release and needs no word.
 Changing the company itself (this handbook, rules, agents, skills,
 plugins, settings) needs the founder's yes to a change described in plain
 words first.

@@ -34,16 +34,17 @@ flowchart TD
     C --> Y{"Founder says yes?"}
     Y -- "change a line" --> C
     Y -- yes --> D["3. Build<br>with the plan's skills: design for every screen,<br>clean code, security from the first line"]
-    D --> E["4. Check<br>tools and a real browser, then independent reviewers:<br>code always, screens, security"]
+    D --> E["4. Check<br>fast, by the lead alone: tools, the tests of<br>the changed files and a real browser"]
     E -- "something is off" --> D
     E -- good --> G["5. Show<br>screenshot or URL, what was assumed,<br>what is not done"]
+    G --> L["Push live, on the founder's word:<br>every test, then independent reviewers<br>on all that changed since the last one"]
     G --> H["Commit, merge, release:<br>only on the founder's word"]
     G --> P["Production, on the founder's word:<br>full sweep of the whole product<br>before real users or real data"]
 ```
 
 The lead also thinks like a business partner. For a new product or a large feature it works out who it is for, what already exists, the simpler way and what it costs to run, and the plan says why the product is worth building and gives plain advice when it would build less or something different. What the company learns across projects goes into one short skill, lessons, read when a project starts. It has two files in `antigravity/skills/lessons/`. `kit.md` holds the lessons that come with the kit: it is in this repo, every laptop has the same one, and `bash update.sh` brings new lessons. `SKILL.md` is yours: `update.sh` creates it once, the company adds your own lessons there, and git ignores it, so your notes never leave your laptop. It lives inside your clone of this repo: keep a copy before you delete or re-clone that folder.
 
-There are two modes. Building (steps 1 to 5) is the default and checks each change: the builder never has the last word, a code-reviewer reads every code change, and new screens and risky changes get their own reviewer. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
+There are three checks. Building (steps 1 to 5) is the default and is fast: the lead alone runs lint, typecheck, gitleaks, the tests of the files the change touched and a real browser, with no reviewers, no sub-agents and no pull request. Push live, on the founder's word "push live", is the full check of all that changed since the last one: every test, then a code-reviewer, and a reviewer of their own for new screens and risky changes; the builder never has the last word. Production is the full sweep of the whole product, run once on the founder's word "production" before real users or real data: every test level, semgrep, the full security checklist, every dependency, every screen and endpoint.
 
 The founder is not interviewed: no rounds of questions. The lead fills the gaps itself from the order, the project and what a good product of that kind has, and puts every choice in the plan. The founder is asked first only for outward or irreversible actions: deploying to production, deleting data or a repo, a force push, making a repo public, messages to real people, a paid service, secrets, and commit, merge and release. Changing the company itself also needs the founder's yes.
 
