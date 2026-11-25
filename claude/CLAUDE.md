@@ -162,8 +162,8 @@ branch with unmerged work; a database change that can lose data (back it
 up first); a force push; making a repo public; sending
 messages to real people; a paid service; secrets and credentials. Commit,
 push, merge and release happen on the founder's word; the lead does them
-itself, github-secretary only a release. A pull request only for a
-protected branch.
+itself, github-secretary only a release. Merge only on green CI and the
+checked commit.
 A local checkpoint (step 3) is not a release and needs no word.
 Changing the company itself (this handbook, rules, agents, skills,
 plugins, settings) needs the founder's yes to a change described in plain

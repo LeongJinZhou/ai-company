@@ -517,7 +517,7 @@ test('only the founder decides outward and irreversible actions', () => {
   all(section(md, 'Only the founder decides'), [
     /deploying to production/, /deleting data, a repo or a\s+branch with unmerged work/, /a force push/, /making a repo public/,
     /messages to real people/, /a paid service/, /secrets and credentials/, /Commit,\s+push, merge and release happen on the founder's word; the lead does them\s+itself, github-secretary only a release/,
-    /A pull request only for a\s+protected branch/, /Changing the company itself/, /needs the founder's yes to a change described in plain\s+words first/,
+    /Merge only on green CI and the\s+checked commit/, /Changing the company itself/, /needs the founder's yes to a change described in plain\s+words first/,
   ]);
   const sec = read('claude/agents/github-secretary.md');
   all(sec, [
