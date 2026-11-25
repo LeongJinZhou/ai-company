@@ -5,7 +5,7 @@ All notable changes to this repo are listed here, in the Keep a Changelog format
 ## [Unreleased]
 
 ### Added
-- The handbook keeps `docs/STATUS.md` short: the two newest rounds of work stay there in full, older ones move, unchanged, to `docs/HISTORY.md`, which a session reads only when a task needs it. The project template names the new file. Seen on one project: the status file had grown to 65 KB because every round was appended, and every session read all of it; after the move it was 10 KB and nothing was lost. Existing projects are not changed by this: the lead moves the older rounds the next time it updates the status file
+- The handbook keeps `docs/STATUS.md` short: everything still open and the two newest rounds of work stay there in full, older rounds move, unchanged, to `docs/HISTORY.md`, which a session reads only when a task needs it. Open work never moves out of the status file: no session reads the history at the start. The project template names the new file. Seen on one project: the status file had grown to 65 KB because every round was appended, and every session read all of it; after the move it was 10 KB and nothing was lost. Existing projects are not changed by this: the lead moves the older rounds the next time it updates the status file
 
 ## [2.0.3] - 2026-11-19
 
